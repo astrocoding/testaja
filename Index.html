@@ -2443,15 +2443,24 @@ function lfComponentPrice(comp){
     const hasWidths = b.widths && b.widths.length>0;
     const gapTxt = comp.oGap==='standar' ? 'Jarak Standar 5cm' : `Jarak Request ${comp.oGapVal}cm`;
     if(hasWidths){
-      const lenM = comp.oLenMeter||0;
       const rate = b[lfPriceKey(comp.price)+'_per_m'] ?? b['harga_umum_per_m'] ?? 0;
-      const orientTxt = comp.oOrientation==='rotated' ? 'objek dirotate 90°' : 'searah bahan';
-      // Lebar Bahan (widths) murni referensi stok -- TIDAK dikalikan ke harga.
-      // Harga = panjang terpakai x harga/meter (harga/meter sudah full-width), semua gsm sama rumusnya.
-      matTotal = lenM*rate;
-      meterForLam = lenM;
-      infoTxt = `${comp.ow}×${comp.oh}cm/pcs (${orientTxt}) · ${comp.oPerRow} pcs/baris × ${comp.oRows} baris · panjang ${lenM.toFixed(2)}m × ${rp(rate)}/m`;
-      lines.push({label:`${b.nama}`, sub:`${gapTxt} · ${comp.oPerRow}pcs/baris × ${comp.oRows}baris (${qty}pcs total) · ${lenM.toFixed(2)}m × ${rp(rate)}/m (stok lebar ${comp.oWidth||b.widths[0]}cm, ref saja)`, val:matTotal});
+      if(comp.src==='graha'){
+        // Graha: Total = Lebar Objek(m) x Tinggi Objek(m) x harga/m x qty -- luas objek langsung,
+        // TIDAK peduli lebar stock roll / layout muat berapa per baris.
+        const owM = (comp.ow||0)/100, ohM = (comp.oh||0)/100;
+        matTotal = owM*ohM*rate*qty;
+        meterForLam = Math.max(owM, ohM)*qty;
+        infoTxt = `${comp.ow}×${comp.oh}cm/pcs · ${(owM*ohM).toFixed(2)} m²/pcs × ${rp(rate)}/m² × ${qty}pcs`;
+        lines.push({label:`${b.nama}`, sub:`${comp.ow}×${comp.oh}cm = ${(owM*ohM).toFixed(2)}m² × ${rp(rate)} × ${qty}pcs`, val:matTotal});
+      } else {
+        const lenM = comp.oLenMeter||0;
+        const orientTxt = comp.oOrientation==='rotated' ? 'objek dirotate 90°' : 'searah bahan';
+        // Purwakarta: Lebar Bahan = ukuran final hasil potong mesin -- harga = panjang terpakai x harga/meter
+        matTotal = lenM*rate;
+        meterForLam = lenM;
+        infoTxt = `${comp.ow}×${comp.oh}cm/pcs (${orientTxt}) · ${comp.oPerRow} pcs/baris × ${comp.oRows} baris · panjang ${lenM.toFixed(2)}m × ${rp(rate)}/m`;
+        lines.push({label:`${b.nama}`, sub:`${gapTxt} · ${comp.oPerRow}pcs/baris × ${comp.oRows}baris (${qty}pcs total) · ${lenM.toFixed(2)}m × ${rp(rate)}/m (stok lebar ${comp.oWidth||b.widths[0]}cm)`, val:matTotal});
+      }
     } else {
       // Outsourcing: per m2, dihitung per pcs x qty (tidak ada layout baris karena tanpa batas lebar)
       // Harga jual per m2 bisa diedit manual oleh sales (acuan vendor outsourcing bervariasi)
