@@ -385,6 +385,7 @@ select:focus,input:focus{outline:none;border-color:var(--accent);box-shadow:0 0 
           <label>Satuan</label>
           <select id="a3-qty-order-unit">
             <option value="Pcs">Pcs</option>
+            <option value="Lembar">Lembar</option>
             <option value="Buku">Buku</option>
             <option value="Set">Set</option>
             <option value="Rim">Rim</option>
@@ -397,27 +398,48 @@ select:focus,input:focus{outline:none;border-color:var(--accent);box-shadow:0 0 
     </div>
 
     <div class="card">
-      <div class="step"><span class="n">2</span><h2>Komponen Cetak</h2><span class="hint" id="a3-comp-count"></span></div>
+      <div class="step"><span class="n">2</span><h2>Design</h2><span class="hint">opsional</span></div>
+      <div class="field">
+        <label>Sudah Ada Design?</label>
+        <div class="seg" id="a3-design-status">
+          <button data-v="sudah" class="on">Sudah Ada</button>
+          <button data-v="belum">Belum Ada</button>
+        </div>
+      </div>
+      <div class="field" id="a3-design-harga-wrap" style="display:none">
+        <label>Harga Jasa Design</label>
+        <input type="number" id="a3-design-harga" min="0" inputmode="numeric" placeholder="Isi harga jasa design">
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="step"><span class="n">3</span><h2>Komponen Cetak</h2><span class="hint" id="a3-comp-count"></span></div>
       <div id="a3-components"></div>
       <button class="addrow-btn" id="a3-add-comp">+ Tambah Komponen</button>
     </div>
 
     <div class="card">
-      <div class="step"><span class="n">3</span><h2>Finishing Gabungan</h2><span class="hint">manual</span></div>
+      <div class="step"><span class="n">4</span><h2>Finishing Gabungan</h2><span class="hint">manual</span></div>
       <div class="note" style="margin:0 0 12px">Berlaku untuk keseluruhan produk (gabungan semua komponen). Belum ada pricelist resmi — isi harga manual.</div>
       <div id="a3-finishings"></div>
       <button class="addrow-btn" id="a3-add-fin">+ Tambah Finishing</button>
     </div>
 
     <div class="card">
-      <div class="step"><span class="n">4</span><h2>Material Tambahan</h2><span class="hint">manual</span></div>
+      <div class="step"><span class="n">5</span><h2>Material Tambahan</h2><span class="hint">manual</span></div>
       <div class="note" style="margin:0 0 12px">Material di luar bahan cetak utama (mis. amplas, double tape, mika, dsb). Isi nama, harga, dan qty manual.</div>
       <div id="a3-materials"></div>
       <button class="addrow-btn" id="a3-add-material">+ Tambah Material Tambahan</button>
     </div>
 
     <div class="card">
-      <div class="step"><span class="n">5</span><h2>Margin Tambahan</h2><span class="hint">opsional</span></div>
+      <div class="step"><span class="n">6</span><h2>Total Order</h2><span class="hint">info</span></div>
+      <div class="subtotal-box" id="a3-total-order-box"></div>
+      <div class="note" style="margin-top:10px">Untuk Harga A3+ dan Large Format sudah menggunakan Harga Jual Umum.</div>
+    </div>
+
+    <div class="card">
+      <div class="step"><span class="n">7</span><h2>Margin Tambahan</h2><span class="hint">opsional</span></div>
       <div class="field">
         <label>Persentase Margin</label>
         <div class="pills" id="a3-margin">
@@ -436,7 +458,7 @@ select:focus,input:focus{outline:none;border-color:var(--accent);box-shadow:0 0 
     </div>
 
     <div class="card">
-      <div class="step"><span class="n">6</span><h2>Diskon</h2><span class="hint">nego</span></div>
+      <div class="step"><span class="n">8</span><h2>Diskon</h2><span class="hint">nego</span></div>
       <div class="subtotal-box" id="a3-diskon-base"></div>
       <div class="field">
         <label>Persentase Diskon</label>
@@ -1613,7 +1635,7 @@ const segVal = id => $(id).querySelector('button.on').dataset.v;
 let mode='a3';
 let gabCompSeq=0, gabFinSeq=0;
 const state = {
-  a3:{nama:'', qtyOrder:1, qtyOrderUnit:'Pcs', components:new Map(), finishings:new Map(), materials:new Map(), margin:0, marginMode:'0', diskon:0, diskonMode:'0'},
+  a3:{nama:'', qtyOrder:1, qtyOrderUnit:'Pcs', designStatus:'sudah', designHarga:0, components:new Map(), finishings:new Map(), materials:new Map(), margin:0, marginMode:'0', diskon:0, diskonMode:'0'},
   lf:{nama:'', qtyOrder:1, qtyOrderUnit:'Pcs', components:new Map(), margin:0, marginMode:'0', diskon:0, diskonMode:'0'},
   brosur:{nama:'', qtyOrder:1, qtyOrderUnit:'Paket', components:new Map(), margin:0, marginMode:'0', diskon:0, diskonMode:'0'},
   kn:{nama:'', qtyOrder:1, qtyOrderUnit:'Box', components:new Map(), finishings:new Map(), margin:0, marginMode:'0', diskon:0, diskonMode:'0'},
@@ -2055,6 +2077,15 @@ const JENIS_ORDER_A3 = {
     autoComponents: ["Voucher"]
   },
 
+  print_a3: {
+    label: "Print A3+",
+    fields: [
+      { key: "material", label: "Jenis Material", type: "select", required: true, options: [] }
+    ],
+    autoComponents: ["Cetak 1"],
+    note: "Ukuran default mengikuti ukuran kertas dari Material yang dipilih (tidak perlu hitung layout objek) -- cocok utk order yg cuma cetak polos di kertas A3+ apa adanya. Bisa tambah komponen, dan Hitung Layout Objek tetap bisa dipakai manual kalau ternyata perlu."
+  },
+
   lainnya: {
     label: "Lainnya",
     fields: [
@@ -2070,6 +2101,7 @@ const JENIS_ORDER_A3 = {
 
 // Urutan tampil di dropdown "Jenis Order" (mengikuti urutan daftar asli)
 const JENIS_ORDER_A3_URUTAN = [
+  "print_a3",
   "agenda_notes", "amplop", "booklet", "brosur_flyer_leaflet", "buku_modul",
   "calendar", "company_profile", "cover_buku_laporan", "form", "hang_tag",
   "id_card", "kalender", "kartu_nama", "kop_surat", "katalog", "map_folder",
@@ -2087,6 +2119,9 @@ if (typeof module !== "undefined" && module.exports) {
 const JENIS_ORDER_K2 = new Set([
   "agenda_notes","booklet","buku_modul","calendar","kalender","company_profile","katalog","packaging"
 ]);
+// Kelompok 3: cetak polos, size default ikut ukuran kertas Material, bisa tambah komponen,
+// TIDAK butuh Finishing Gabungan (beda dari K2), Hitung Layout Objek tetap tersedia manual.
+const JENIS_ORDER_K3 = new Set(["print_a3"]);
 const FINISHING_KOMPONEN_GENERIK = ["Laminasi Glossy","Laminasi Doff","Pond","Emboss","Foil","Spot UV"];
 const FINISHING_GABUNGAN_GENERIK = ["Tanpa","Steples","Jahit Buku","Spiral","Lem Panas","Jilid Lem","Hardcover"];
 // Finishing yg berarti "dilipat dari lembar lebih besar" -- Size Cetak = 2x Size Jadi (aturan lipat ISO: cetakW=jadiH, cetakH=2*jadiW)
@@ -2667,7 +2702,15 @@ function calcA3(){
     lines.push({label:nm, sub:`${rp(mat.harga||0)} × ${mat.qty||1} (harga manual)`, val:t, isMainItem:true});
   });
 
-  const subtotal = compTotal+finTotal+materialTotal;
+  let designTotal=0;
+  if(state.a3.designStatus==='belum' && state.a3.designHarga>0){
+    designTotal = state.a3.designHarga;
+    lines.push({label:'Jasa Design', sub:'Belum ada design — biaya design manual', val:designTotal, isMainItem:true});
+  }
+
+  const subtotal = compTotal+finTotal+materialTotal+designTotal;
+  const totalOrderBox = $('#a3-total-order-box');
+  if(totalOrderBox) totalOrderBox.innerHTML = `<span>Total Order (sebelum Margin/Diskon)</span><b>${rp(subtotal)}</b>`;
   const marginPct = state.a3.margin||0;
   const marginVal = subtotal*(marginPct/100);
   const afterMargin = subtotal+marginVal;
@@ -4524,6 +4567,9 @@ function karawangAddFinishing(container, finMap, getDefaults){
   return node;
 }
 
+// Item Finishing Gabungan yg sifatnya "sekali per order/set", bukan per-pcs -- qty TIDAK ikut Qty Order
+const FINISHING_PER_SET_NAMES = new Set(['Potong Jadi']);
+
 function gabunganAddFinishing(container, finMap, getDefaults){
   const id = 'gf'+(++gabFinSeq);
   const tpl = document.getElementById('tpl-offset-finishing');
@@ -4537,8 +4583,14 @@ function gabunganAddFinishing(container, finMap, getDefaults){
     .map(f=>({nama:f.nama+' (Otomatis)', realNama:f.nama, isManual:false}));
   const allOptions = [...manualOptions, ...otomatisOptions];
 
+  function defaultQtyFor(nama){
+    if(FINISHING_PER_SET_NAMES.has(nama)) return 1;
+    const d = getDefaults ? getDefaults() : {};
+    return d.qty!=null ? d.qty : 1;
+  }
+
   const first = allOptions[0];
-  const finState = {nama:first.realNama||first.nama, isManual:first.isManual, customName:'', harga:0, qty:1};
+  const finState = {nama:first.realNama||first.nama, isManual:first.isManual, customName:'', harga:0, qty:defaultQtyFor(first.realNama||first.nama)};
   finMap.set(id, finState);
 
   const nameSel = node.querySelector('.offin-name');
@@ -4563,13 +4615,17 @@ function gabunganAddFinishing(container, finMap, getDefaults){
         });
       });
       const note = node.querySelector('.offin-note');
-      note.innerHTML = `Harga & qty isi manual.`;
+      note.innerHTML = FINISHING_PER_SET_NAMES.has(finState.nama)
+        ? `Harga & qty isi manual. Qty defaultnya 1 (sekali per order/set, bukan per pcs).`
+        : `Harga & qty isi manual. Qty default = Qty Order.`;
     } else {
       if(customWrap) customWrap.style.display='none';
       const f = DATA.offset.finishing.find(x=>x.nama===finState.nama);
+      if(f && finState.rateOverride==null) finState.rateOverride = f.harga_satuan||0;
+      const hargaHtml = f ? `<div class="field"><label>Harga Satuan (suggest, bisa diedit)</label><input type="number" class="offin-rate" value="${finState.rateOverride}" inputmode="numeric"></div>` : '';
       const fields = offsetFinishingExtraFields(f ? f.deskripsi : '');
       const defaults = getDefaults ? getDefaults() : {};
-      wrap.innerHTML = fields.map(key=>{
+      wrap.innerHTML = hargaHtml + fields.map(key=>{
         let val = finState[key];
         if(val==null){
           if(key==='qty') val = defaults.qty!=null ? defaults.qty : 1;
@@ -4589,6 +4645,13 @@ function gabunganAddFinishing(container, finMap, getDefaults){
         const key = inp.dataset.key;
         if(finState[key]==null) finState[key] = parseDec(inp.value);
       });
+      const rateInp = wrap.querySelector('.offin-rate');
+      if(rateInp){
+        rateInp.addEventListener('input', e=>{
+          finState.rateOverride = +e.target.value||0;
+          calc();
+        });
+      }
       const note = node.querySelector('.offin-note');
       note.innerHTML = f ? `Rumus: ${f.deskripsi}${f.harga_minim!=null?` · Minimum ${rp(f.harga_minim)}`:''}` : '';
     }
@@ -4600,7 +4663,7 @@ function gabunganAddFinishing(container, finMap, getDefaults){
     Object.keys(finState).forEach(k=>{ if(k!=='nama') delete finState[k]; });
     finState.nama = realNama;
     finState.isManual = isManual;
-    if(isManual){ finState.customName=''; finState.harga=0; finState.qty=1; }
+    if(isManual){ finState.customName=''; finState.harga=0; finState.qty=defaultQtyFor(realNama); }
     renderFields();
     calc();
   });
@@ -5335,6 +5398,20 @@ $$('.tab').forEach(t=>t.addEventListener('click',()=>{
 
 // LF component wiring
 $('#lf-nama').addEventListener('input', e=>{ state.lf.nama=e.target.value; });
+// Sinkron live: qty semua baris Finishing Gabungan ikut Qty Order terbaru
+// (kecuali item yg sifatnya sekali per order/set, spt Potong Jadi)
+function syncFinishingGabunganQty(containerSel, finMap, newQty){
+  finMap.forEach((finState, id)=>{
+    if(FINISHING_PER_SET_NAMES.has(finState.nama)) return;
+    finState.qty = newQty;
+    const row = document.querySelector(`${containerSel} .fin-row[data-id="${id}"]`);
+    if(row){
+      const inp = row.querySelector('.offin-f[data-key="qty"]');
+      if(inp) inp.value = newQty;
+    }
+  });
+}
+
 $('#lf-qty-order').addEventListener('input', e=>{ state.lf.qtyOrder=Math.max(1,+e.target.value||1); calc(); });
 $('#lf-qty-order-unit').addEventListener('change', e=>{ state.lf.qtyOrderUnit=e.target.value; calc(); });
 $('#lf-add-comp').addEventListener('click', ()=>{ lfAddComponent(''); calc(); });
@@ -5468,9 +5545,31 @@ $('#a3-qty-order').addEventListener('input', e=>{
       }
     });
   }
+  // sinkron live ke qty Finishing Gabungan yg otomatis terbentuk dari Item Order Kelompok 2
+  // (Booklet/Company Profile dkk -- finishing gabungan HARUS ikut Qty Order, beda dari
+  // item spt Potong Jadi yg tetap 1 set)
+  if(typeof a3JoFinRowId!=='undefined' && a3JoFinRowId){
+    const finState = state.a3.finishings.get(a3JoFinRowId);
+    const row = document.querySelector(`#a3-finishings .fin-row[data-id="${a3JoFinRowId}"]`);
+    if(finState && row && !FINISHING_PER_SET_NAMES.has(finState.nama)){
+      finState.qty = state.a3.qtyOrder;
+      const qtyInp = row.querySelector('.offin-f[data-key="qty"]');
+      if(qtyInp) qtyInp.value = finState.qty;
+    }
+  }
   calc();
 });
 $('#a3-qty-order-unit').addEventListener('change', e=>{ state.a3.qtyOrderUnit=e.target.value; calc(); });
+
+$('#a3-design-status').addEventListener('click', e=>{
+  const btn=e.target.closest('button'); if(!btn) return;
+  $('#a3-design-status').querySelectorAll('button').forEach(x=>x.classList.remove('on'));
+  btn.classList.add('on'); state.a3.designStatus=btn.dataset.v;
+  $('#a3-design-harga-wrap').style.display = state.a3.designStatus==='belum' ? '' : 'none';
+  calc();
+});
+$('#a3-design-harga').addEventListener('input', e=>{ state.a3.designHarga=+e.target.value||0; calc(); });
+
 
 // ===== Jenis Order: dropdown + preview spesifikasi dinamis (belum terhubung ke Komponen Cetak) =====
 let a3JenisOrderState = { key:'', k1:null, k2:null };
@@ -5647,9 +5746,92 @@ function a3RenderJenisOrderPreview(){
   if(!key){ box.innerHTML=''; a3UpdateCompCount(); calc(); return; }
   const def = JENIS_ORDER_A3[key];
   const isK2 = JENIS_ORDER_K2.has(key);
+  const isK3 = JENIS_ORDER_K3.has(key);
   const ukuranOpts = (def.fields.find(f=>f.key==='ukuran')||{}).options || ['Custom'];
 
-  if(!isK2){
+  if(isK3){
+    box.innerHTML = `<div class="comp-sub comp-sub-utama"><label class="comp-section-lbl">Spesifikasi: ${def.label}</label>
+      <div class="note" style="margin:0 0 10px">${def.note||''}</div></div>
+      <div class="jok3-komponen-list"></div>
+      <div class="field"><button class="addrow-btn" id="jok3-add-komponen" type="button">+ Tambah Komponen</button></div>`;
+
+    const listEl = box.querySelector('.jok3-komponen-list');
+    let jok3Seq = 0;
+
+    function addKomponenBlockK3(nama){
+      const id = 'jok3c'+(++jok3Seq)+'_'+(++a3JoK2Seq);
+      const wrap = document.createElement('div');
+      wrap.className = 'comp-sub comp-sub-kertas';
+      wrap.dataset.id = id;
+      wrap.innerHTML = `<div class="comp-head" style="justify-content:space-between;align-items:center">
+          <label class="comp-section-lbl" style="margin:0">Komponen: ${nama}</label>
+          <button class="jok3-remove" type="button" title="Hapus komponen">✕</button>
+        </div>
+        <div class="field">
+          <label>Jenis Material</label>
+          <select class="${id}-material">
+            <option value="">— Pilih Material —</option>
+            ${a3MaterialOptionsHtml()}
+          </select>
+        </div>
+        <div class="tierinfo ${id}-sheetnote"></div>`;
+      listEl.appendChild(wrap);
+
+      const node = a3AddComponent(nama);
+      const compState = state.a3.components.get(node.dataset.id);
+      a3JoLinks.k2.push({compId:node.dataset.id, refreshFn:()=>{}});
+
+      const sel = wrap.querySelector(`.${id}-material`);
+      const noteEl = wrap.querySelector(`.${id}-sheetnote`);
+      sel.addEventListener('change', e=>{
+        const found = DATA.a3.full_color.find(b=>b.nama===e.target.value);
+        if(!found) return;
+        compState.cat = found.kategori;
+        node.querySelector('.comp-cat').value = compState.cat;
+        a3FillBahan(node, compState);
+        compState.bahan = found.nama;
+        node.querySelector('.comp-bahan').value = found.nama;
+        a3UpdateMukaLock(node, compState);
+        a3UpdateCuttingAvailability(node, compState);
+        a3FillAddons(node, compState);
+        // ukuran default = ukuran kertas dari material (bukan hitung layout objek kecil)
+        const sheet = parseUkuranPreset(found.ukuran);
+        if(sheet){
+          compState.objOn = true;
+          node.querySelector('.comp-obj-on').setAttribute('aria-checked','true');
+          node.querySelector('.comp-obj-panel').style.display = '';
+          compState.ow = sheet.w; compState.oh = sheet.h;
+          node.querySelector('.comp-ow').value = sheet.w;
+          node.querySelector('.comp-oh').value = sheet.h;
+          compState.oqty = Math.max(1, Math.floor(state.a3.qtyOrder||1));
+          node.querySelector('.comp-oqty').value = compState.oqty;
+          renderCompLayout(node, compState);
+          noteEl.innerHTML = `Ukuran default ikut kertas: <b>${sheet.w}×${sheet.h}cm</b> (bisa diedit manual di "Hitung Layout Objek" di bawah kalau perlu layout objek lebih kecil).`;
+        }
+        calc();
+      });
+
+      wrap.querySelector('.jok3-remove').addEventListener('click', ()=>{
+        wrap.remove();
+        state.a3.components.delete(node.dataset.id);
+        node.remove();
+        a3JoLinks.k2 = a3JoLinks.k2.filter(x=>x.compId!==node.dataset.id);
+        a3UpdateCompCount();
+        calc();
+      });
+    }
+
+    const komponenAwal = def.autoComponents && def.autoComponents.length ? def.autoComponents : ['Cetak 1'];
+    komponenAwal.forEach(nm=>addKomponenBlockK3(nm));
+
+    box.querySelector('#jok3-add-komponen').addEventListener('click', ()=>{
+      const nama = prompt('Nama komponen baru (mis. Cetak 2, Sisipan):', 'Cetak Tambahan');
+      if(nama && nama.trim()){
+        addKomponenBlockK3(nama.trim());
+        a3UpdateCompCount();
+      }
+    });
+  } else if(!isK2){
     box.innerHTML = `<div class="comp-sub comp-sub-utama">
       <label class="comp-section-lbl">Spesifikasi: ${def.label}</label>
       ${a3SizeJadiHtml('jok1', ukuranOpts)}
@@ -5728,14 +5910,10 @@ function a3RenderJenisOrderPreview(){
 
 $('#a3-jenisorder').addEventListener('change', e=>{
   a3JenisOrderState.key = e.target.value;
-  a3RenderJenisOrderPreview();
-});
-a3RenderJenisOrderDropdown();
-
-
-
-$('#a3-jenisorder').addEventListener('change', e=>{
-  a3JenisOrderState.key = e.target.value;
+  if(e.target.value==='print_a3'){
+    state.a3.qtyOrderUnit = 'Lembar';
+    $('#a3-qty-order-unit').value = 'Lembar';
+  }
   a3RenderJenisOrderPreview();
 });
 a3RenderJenisOrderDropdown();
@@ -5753,6 +5931,10 @@ function resetApp(){
   // bersihkan state
   state.a3.nama=''; state.a3.components.clear(); state.a3.finishings.clear(); state.a3.materials.clear();
   state.a3.margin=0; state.a3.marginMode='0'; state.a3.diskon=0; state.a3.diskonMode='0';
+  state.a3.designStatus='sudah'; state.a3.designHarga=0;
+  $('#a3-design-status').querySelectorAll('button').forEach(b=>b.classList.toggle('on', b.dataset.v==='sudah'));
+  $('#a3-design-harga-wrap').style.display='none';
+  $('#a3-design-harga').value='';
   state.lf.nama=''; state.lf.components.clear();
   state.lf.margin=0; state.lf.marginMode='0'; state.lf.diskon=0; state.lf.diskonMode='0';
   state.brosur.nama=''; state.brosur.components.clear();
