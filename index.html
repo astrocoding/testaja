@@ -458,9 +458,14 @@ select:focus,input:focus{outline:none;border-color:var(--accent);box-shadow:0 0 
         <label>Persentase Margin</label>
         <div class="pills" id="a3-margin">
           <button data-v="0" class="on">0%</button>
-          <button data-v="10">10%</button>
+          <button data-v="15">15%</button>
           <button data-v="20">20%</button>
+          <button data-v="25">25%</button>
           <button data-v="30">30%</button>
+          <button data-v="35">35%</button>
+          <button data-v="40">40%</button>
+          <button data-v="45">45%</button>
+          <button data-v="50">50%</button>
           <button data-v="custom">Custom</button>
         </div>
       </div>
@@ -495,10 +500,24 @@ select:focus,input:focus{outline:none;border-color:var(--accent);box-shadow:0 0 
   <!-- ================= LF (keranjang komponen) ================= -->
   <section id="mode-lf" style="display:none">
     <div class="card">
-      <div class="step"><span class="n">1</span><h2>Jenis Order</h2><span class="hint">opsional</span></div>
+      <div class="step"><span class="n">1</span><h2>Order Description</h2><span class="hint">opsional</span></div>
       <div class="field">
-        <label>Jenis Order</label>
+        <label>Nama Order (custom, opsional)</label>
         <input type="text" id="lf-nama" placeholder="mis. Banner Event, X-Banner Promo">
+      </div>
+      <div class="field">
+        <label>Jenis Order (utk Item Order #1)</label>
+        <select id="lf-jenisorder">
+          <option value="">— Pilih Jenis Order —</option>
+        </select>
+      </div>
+      <div class="field" id="lf-subvarian-wrap" style="display:none">
+        <label>Sub Varian</label>
+        <select id="lf-subvarian"></select>
+      </div>
+      <div class="field" id="lf-topping-wrap" style="display:none">
+        <label>Pilihan Bahan</label>
+        <select id="lf-topping"></select>
       </div>
       <div class="row2">
         <div class="field">
@@ -531,9 +550,14 @@ select:focus,input:focus{outline:none;border-color:var(--accent);box-shadow:0 0 
         <label>Persentase Margin</label>
         <div class="pills" id="lf-margin">
           <button data-v="0" class="on">0%</button>
-          <button data-v="10">10%</button>
+          <button data-v="15">15%</button>
           <button data-v="20">20%</button>
+          <button data-v="25">25%</button>
           <button data-v="30">30%</button>
+          <button data-v="35">35%</button>
+          <button data-v="40">40%</button>
+          <button data-v="45">45%</button>
+          <button data-v="50">50%</button>
           <button data-v="custom">Custom</button>
         </div>
       </div>
@@ -598,9 +622,14 @@ select:focus,input:focus{outline:none;border-color:var(--accent);box-shadow:0 0 
         <label>Persentase Margin</label>
         <div class="pills" id="brosur-margin">
           <button data-v="0" class="on">0%</button>
-          <button data-v="10">10%</button>
+          <button data-v="15">15%</button>
           <button data-v="20">20%</button>
+          <button data-v="25">25%</button>
           <button data-v="30">30%</button>
+          <button data-v="35">35%</button>
+          <button data-v="40">40%</button>
+          <button data-v="45">45%</button>
+          <button data-v="50">50%</button>
           <button data-v="custom">Custom</button>
         </div>
       </div>
@@ -673,9 +702,14 @@ select:focus,input:focus{outline:none;border-color:var(--accent);box-shadow:0 0 
         <label>Persentase Margin</label>
         <div class="pills" id="kn-margin">
           <button data-v="0" class="on">0%</button>
-          <button data-v="10">10%</button>
+          <button data-v="15">15%</button>
           <button data-v="20">20%</button>
+          <button data-v="25">25%</button>
           <button data-v="30">30%</button>
+          <button data-v="35">35%</button>
+          <button data-v="40">40%</button>
+          <button data-v="45">45%</button>
+          <button data-v="50">50%</button>
           <button data-v="custom">Custom</button>
         </div>
       </div>
@@ -760,9 +794,14 @@ select:focus,input:focus{outline:none;border-color:var(--accent);box-shadow:0 0 
         <label>Persentase Margin</label>
         <div class="pills" id="offset-margin">
           <button data-v="0" class="on">0%</button>
-          <button data-v="10">10%</button>
+          <button data-v="15">15%</button>
           <button data-v="20">20%</button>
+          <button data-v="25">25%</button>
           <button data-v="30">30%</button>
+          <button data-v="35">35%</button>
+          <button data-v="40">40%</button>
+          <button data-v="45">45%</button>
+          <button data-v="50">50%</button>
           <button data-v="custom">Custom</button>
         </div>
       </div>
@@ -825,9 +864,14 @@ select:focus,input:focus{outline:none;border-color:var(--accent);box-shadow:0 0 
         <label>Persentase Margin</label>
         <div class="pills" id="cp-margin">
           <button data-v="0" class="on">0%</button>
-          <button data-v="10">10%</button>
+          <button data-v="15">15%</button>
           <button data-v="20">20%</button>
+          <button data-v="25">25%</button>
           <button data-v="30">30%</button>
+          <button data-v="35">35%</button>
+          <button data-v="40">40%</button>
+          <button data-v="45">45%</button>
+          <button data-v="50">50%</button>
           <button data-v="custom">Custom</button>
         </div>
       </div>
@@ -1507,6 +1551,12 @@ select:focus,input:focus{outline:none;border-color:var(--accent);box-shadow:0 0 
     <div class="mat-penbaut-fields" style="display:none">
       <input type="number" class="mat-penbaut-price" min="0" placeholder="Harga/pcs (klik untuk edit)" inputmode="numeric">
     </div>
+    <div class="mat-perset-fields" style="display:none">
+      <input type="number" class="mat-perset-price" min="0" placeholder="Harga per Set" inputmode="numeric">
+    </div>
+    <div class="field" style="margin-top:8px">
+      <input type="text" class="mat-desc" placeholder="Deskripsi (opsional, isian bebas)">
+    </div>
     <div class="fin-fields">
       <input type="number" class="mat-qty" min="1" value="1" placeholder="Qty" inputmode="numeric">
     </div>
@@ -1616,6 +1666,31 @@ const DATA = {"a3":{"full_color":[{"kategori":"Art Carton/Art Paper","nama":"Art
 const $ = s => document.querySelector(s);
 const $$ = s => [...document.querySelectorAll(s)];
 const rp = n => 'Rp ' + Math.round(n).toLocaleString('id-ID');
+
+// ================= Target Margin (bukan Markup) =================
+// Harga Jual = HPP / (1 - Margin%), BUKAN HPP x (1 + Markup%).
+// Dipakai di SEMUA tab (A3+, LF, Brosur, KN, Offset, Company Profile) supaya
+// margin yg dihasilkan benar2 sesuai target (laba/harga jual), bukan laba/HPP.
+function applyTargetMargin(hpp, marginPct){
+  const pct = Math.max(0, Math.min(marginPct||0, 99.99)); // guard div-by-zero/negatif
+  if(pct<=0) return {laba:0, hargaJual:hpp, marginAktual:0, markupEkivalen:0};
+  const hargaJual = hpp/(1-pct/100);
+  const laba = hargaJual-hpp;
+  const marginAktual = hargaJual>0 ? (laba/hargaJual*100) : 0;
+  const markupEkivalen = hpp>0 ? (laba/hpp*100) : 0;
+  return {laba, hargaJual, marginAktual, markupEkivalen};
+}
+// Baris ringkasan Target Margin utk ditampilkan di Rincian (Total HPP, Laba, Harga Jual, Margin Aktual, Markup Ekivalen)
+function targetMarginLines(hpp, marginPct){
+  if(!(marginPct>0)) return [];
+  const r = applyTargetMargin(hpp, marginPct);
+  return [
+    {label:`Margin (Target ${marginPct}%)`, sub:`HPP ${rp(hpp)} ÷ (1-${marginPct}%)`, val:r.laba, isMargin:true},
+    {label:'Margin Aktual (validasi)', sub:`Laba ${rp(r.laba)} ÷ Harga Jual ${rp(r.hargaJual)}`, val:null, dispText:`${r.marginAktual.toFixed(2)}%`},
+    {label:'Markup Ekivalen', sub:'(opsional, laba ÷ HPP)', val:null, dispText:`${r.markupEkivalen.toFixed(2)}%`}
+  ];
+}
+
 // Parse input desimal yang mendukung koma maupun titik sebagai pemisah (mis. "10,5" atau "10.5")
 function parseDec(str){
   if(str==null) return 0;
@@ -2730,10 +2805,11 @@ function calcA3(){
   const totalOrderBox = $('#a3-total-order-box');
   if(totalOrderBox) totalOrderBox.innerHTML = `<span>Total Order (sebelum Margin/Diskon)</span><b>${rp(subtotal)}</b>`;
   const marginPct = state.a3.margin||0;
-  const marginVal = subtotal*(marginPct/100);
-  const afterMargin = subtotal+marginVal;
+  const _mt = applyTargetMargin(subtotal, marginPct);
+  const marginVal = _mt.laba;
+  const afterMargin = _mt.hargaJual;
   if(marginPct>0){
-    lines.push({label:`Margin (${marginPct}%)`, sub:`${rp(subtotal)} × ${marginPct}%`, val:marginVal, isMargin:true});
+    lines.push(...targetMarginLines(subtotal, marginPct));
   }
   const diskonPct = state.a3.diskon||0;
   const diskonVal = afterMargin*(diskonPct/100);
@@ -2745,6 +2821,99 @@ function calcA3(){
 }
 
 // ================= LF =================
+// ================= LF: Jenis Order -> Sub Varian =================
+// Field berubah mengikuti pilihan: pilih Jenis Order dulu, baru Sub Varian muncul,
+// baru Spesifikasi Produk (Bahan, dipersempit sesuai Sub Varian) muncul.
+const LF_JENIS_ORDER = {
+  print_outdoor: {
+    label: "Print Outdoor",
+    lfSrc: "graha",
+    subVarian: {
+      "flexy280": { label: "Flexy Frontlite China 280 gsm", materials: ["Flexy Frontlite China 280 gsm"] },
+      "flexy340": { label: "Flexy Frontlite China 340 gsm", materials: ["Flexy Frontlite China 340 gsm"] },
+      "flexy440": { label: "Flexy Frontlite China Korchin 440 gsm", materials: ["Flexy Frontlite China Korchin 440 gsm"] },
+      "backlite": { label: "Flexy Backlite 510 gsm", materials: ["Flexy Backlite 510 gsm"] },
+      "jerman": { label: "Flexy Jerman 550 gsm", materials: ["Flexy Jerman 550 gsm"] }
+    }
+  },
+  print_indoor: {
+    label: "Print Indoor",
+    lfSrc: "purwakarta",
+    subVarian: {
+      albatros: { label: "Albatros", materials: ["Albatros"] },
+      luster: { label: "Luster", materials: ["Luster 180 gsm"] },
+      canvas: { label: "Canvas", materials: ["Canvas 380 gsm"] }
+    }
+  },
+  display_promotion: {
+    label: "Display Promotion",
+    lfSrc: "graha",
+    hasToppingChoice: true,
+    subVarian: {
+      x_banner: { label: "X Banner", materials: ["X-Banner"] },
+      y_banner: { label: "Y Banner", materials: ["Y-Banner"] },
+      roll_banner_60: { label: "Roll Up Banner 60 x 160 cm", materials: ["Roll Up Banner 60 x 160 cm"] },
+      roll_banner_80: { label: "Roll Up Banner 80 x 200 cm", materials: ["Roll Up Banner 80 x 200 cm"] },
+      tripod_banner: { label: "Tripod Banner", materials: ["Tripod Board"] },
+      door_frame: { label: "Door Frame", materials: ["Door Frame Standard"] }
+    }
+  },
+  stiker: {
+    label: "Stiker",
+    lfSrc: "purwakarta",
+    subVarian: {
+      vynil_glossy: { label: "Stiker Vynil Glossy", materials: ["Stiker Vynil China 80 Micron","Sticker Vynil Ritrama 80 Micron","Sticker Blockout Ritrama 120 Micron"] },
+      vynil_matte: { label: "Stiker Vynil Matte", materials: ["Stiker Vynil China 80 Micron","Sticker Vynil Ritrama 80 Micron","Sticker Blockout Ritrama 120 Micron"] },
+      transparan: { label: "Stiker Transparan", materials: ["Sticker Transparant Ritrama 80 Micron"] },
+      one_way_vision: { label: "One Way Vision", materials: ["Sticker One Way 160 gsm"] },
+      sandblast: { label: "Sandblast", materials: ["Stiker Sanblast"] }
+    }
+  },
+  lainnya: {
+    label: "Lainnya",
+    lfSrc: "purwakarta",
+    subVarian: {}
+  }
+};
+const LF_JENIS_ORDER_URUTAN = ["print_outdoor","print_indoor","display_promotion","stiker","lainnya"];
+// Opsi Laminating (termasuk "Floor Sticker" yg sebenarnya laminating utk lantai, bukan bahan)
+const LF_LAMINATING_OPTIONS = [
+  { key:"tanpa", label:"Tanpa Laminating" },
+  { key:"doff_glossy", label:"Laminating Doff/Glossy 120 Micron", nama:"Laminating Doff/Glossy 120 Micron" },
+  { key:"flooring", label:"Floor Sticker (Laminating Flooring 170 Micron)", nama:"Laminating Flooring 170 micron" }
+];
+
+function lfApplyDirectMaterialTo(node, compState, jenisKey){
+  const def = LF_JENIS_ORDER[jenisKey];
+  const allMaterials = Object.values(def.subVarian).flatMap(sv=>sv.materials);
+  compState.src = def.lfSrc;
+  node.querySelector('.lfc-src').value = def.lfSrc;
+  const bahanSel = node.querySelector('.lfc-bahan');
+  const filtered = lfBahanList(def.lfSrc).filter(i=>allMaterials.includes(i.nama));
+  bahanSel.innerHTML = `<option value="">— Pilih Bahan —</option>` + filtered.map(i=>`<option value="${i.nama}">${i.nama}</option>`).join('');
+  compState.bahan = null;
+  calc();
+}
+function lfApplySubVarianTo(node, compState, jenisKey, subKey){
+  const def = LF_JENIS_ORDER[jenisKey];
+  const sv = def && def.subVarian[subKey];
+  if(!sv) return;
+  compState.src = def.lfSrc;
+  node.querySelector('.lfc-src').value = def.lfSrc;
+  const bahanSel = node.querySelector('.lfc-bahan');
+  const filtered = lfBahanList(def.lfSrc).filter(i=>sv.materials.includes(i.nama));
+  bahanSel.innerHTML = `<option value="">— Pilih Bahan —</option>` + filtered.map(i=>`<option value="${i.nama}">${i.nama}</option>`).join('');
+  if(filtered.length===1){
+    bahanSel.value = filtered[0].nama;
+    compState.bahan = filtered[0].nama;
+    lfFillLam(node, compState);
+    lfUpdateSizeFields(node, compState);
+  } else {
+    compState.bahan = null;
+  }
+  calc();
+}
+
 function lfBahanList(src){
   if(src==='graha') return [
     ...DATA.lf.graha.bahan.map(x=>({...x, kind:'outdoor', area:'outdoor', grp:'Outdoor'})),
@@ -2833,7 +3002,7 @@ function lfUpdateSizeFields(node, compState){
     const opts = Object.entries(b[priceKey]||{}).filter(([k,v])=>v!=null).map(([k])=>k);
     const fallbackOpts = Object.entries(b.umum||{}).filter(([k,v])=>v!=null).map(([k])=>k);
     const list = opts.length ? opts : fallbackOpts;
-    sel.innerHTML = list.map(o=>`<option value="${o}">${o}</option>`).join('');
+    sel.innerHTML = list.map(o=>`<option value="${o}">${o==='Rangka' ? 'Rangka Saja' : 'Rangka + '+o}</option>`).join('');
     if(!list.includes(compState.rangkaOpt)) compState.rangkaOpt = list[0];
     sel.value = compState.rangkaOpt;
   }
@@ -2989,20 +3158,22 @@ function lfComponentPrice(comp){
     const sw=(comp.stockw||(b.widths?b.widths[0]:127))/100;
     const lenM = comp.iLenMeter||0;
     const area = sw*lenM;
-    let ratePerM2;
+    let ratePerM2, dispBasis;
     if(b.harga_umum_per_m2!=null || b['harga_'+(div?'divisi':'umum')+'_per_m2']!=null){
       // Outsourcing: harga sudah per m2 langsung, tidak perlu basis ref_width
       ratePerM2 = b[lfPriceKey(comp.price)+'_per_m2'] ?? b['harga_umum_per_m2'] ?? 0;
+      dispBasis = `${area.toFixed(2)} m² × ${rp(ratePerM2)}/m²`;
     } else {
-      // Purwakarta: harga per meter lari pada lebar referensi -> konversi ke per m2
+      // Purwakarta: harga per meter lari (bukan per m²) -- basis aslinya panjang(m) x harga/m
       const refW=(b.ref_width||127)/100;
       const refPrice=b[lfPriceKey(comp.price)+'_per_m'] ?? b['harga_umum_per_m'] ?? 0;
       ratePerM2 = refPrice/refW;
+      dispBasis = `${lenM.toFixed(2)}m × ${rp(refPrice)}/m`;
     }
     matTotal=ratePerM2*area;
     meterForLam=lenM;
-    infoTxt = `${comp.iw}×${comp.ih}cm/pcs · ${comp.iPerRow} pcs/baris × ${comp.iRows} baris · lebar ${comp.stockw}cm × ${lenM.toFixed(2)}m = ${area.toFixed(2)} m² × ${rp(ratePerM2)}/m²`;
-    lines.push({label:`${b.nama}`, sub:`${gapTxt} · ${comp.iPerRow}pcs/baris × ${comp.iRows}baris (${qty}pcs total) · ${area.toFixed(2)} m² × ${rp(ratePerM2)}`, val:matTotal});
+    infoTxt = `${comp.iw}×${comp.ih}cm/pcs · ${comp.iPerRow} pcs/baris × ${comp.iRows} baris · lebar ${comp.stockw}cm · ${dispBasis}`;
+    lines.push({label:`${b.nama}`, sub:`${gapTxt} · ${comp.iPerRow}pcs/baris × ${comp.iRows}baris (${qty}pcs total) · ${dispBasis}`, val:matTotal});
   }
 
   let lamTotal=0;
@@ -3125,7 +3296,8 @@ function lfMaterialOptions(){
   const board = DATA.lf.material_tambahan.manual.map(nm=>({nama:nm, kind:'board'}));
   const penbaut = [{nama:DATA.lf.material_tambahan.pen_baut.nama, kind:'penbaut', ref:DATA.lf.material_tambahan.pen_baut}];
   const whiteboard = DATA.lf.material_tambahan.whiteboard.map(x=>({nama:x.nama, kind:'whiteboard', ref:x}));
-  return [...akrilik, ...board, ...penbaut, ...whiteboard];
+  const perset = ['Frame','Panel','Spanram'].map(nm=>({nama:nm, kind:'perset'}));
+  return [...akrilik, ...board, ...penbaut, ...whiteboard, ...perset];
 }
 
 function lfAddMaterial(node, comp){
@@ -3137,7 +3309,7 @@ function lfAddMaterial(node, comp){
 
   const opts = lfMaterialOptions();
   const matState = {nama:opts[0].nama, aw:30, ah:20, shape:'kotak', bw:100, bh:100, bprice:0, qty:1,
-    akrilikMode:'cm2', akrilikRate:null, akrilikSetPrice:0, whiteboardPrice:null, penbautPrice:null};
+    akrilikMode:'cm2', akrilikRate:null, akrilikSetPrice:0, whiteboardPrice:null, penbautPrice:null, persetPrice:0, desc:''};
   comp.materials.set(id, matState);
 
   const nameSel = mnode.querySelector('.mat-name');
@@ -3158,10 +3330,12 @@ function lfAddMaterial(node, comp){
     const isBoard = opt && opt.kind==='board';
     const isWhiteboard = opt && opt.kind==='whiteboard';
     const isPenbaut = opt && opt.kind==='penbaut';
+    const isPerset = opt && opt.kind==='perset';
     mnode.querySelector('.mat-akrilik-fields').style.display = isAkrilik ? '' : 'none';
     mnode.querySelector('.mat-board-fields').style.display = isBoard ? '' : 'none';
     mnode.querySelector('.mat-whiteboard-fields').style.display = isWhiteboard ? '' : 'none';
     mnode.querySelector('.mat-penbaut-fields').style.display = isPenbaut ? '' : 'none';
+    mnode.querySelector('.mat-perset-fields').style.display = isPerset ? '' : 'none';
     if(isAkrilik){
       mnode.querySelector('.mat-akrilik-cm2-wrap').style.display = matState.akrilikMode==='cm2' ? '' : 'none';
       mnode.querySelector('.mat-akrilik-set-wrap').style.display = matState.akrilikMode==='set' ? '' : 'none';
@@ -3210,6 +3384,8 @@ function lfAddMaterial(node, comp){
   mnode.querySelector('.mat-akrilik-setprice').addEventListener('input', e=>{ matState.akrilikSetPrice=+e.target.value||0; calc(); });
   wbInp.addEventListener('input', e=>{ matState.whiteboardPrice=+e.target.value||0; calc(); });
   pbInp.addEventListener('input', e=>{ matState.penbautPrice=+e.target.value||0; calc(); });
+  mnode.querySelector('.mat-perset-price').addEventListener('input', e=>{ matState.persetPrice=+e.target.value||0; calc(); });
+  mnode.querySelector('.mat-desc').addEventListener('input', e=>{ matState.desc=e.target.value; calc(); });
   mnode.querySelector('.mat-bw').addEventListener('input', e=>{ matState.bw=parseDec(e.target.value); calc(); });
   mnode.querySelector('.mat-bh').addEventListener('input', e=>{ matState.bh=parseDec(e.target.value); calc(); });
   mnode.querySelector('.mat-bprice').addEventListener('input', e=>{ matState.bprice=+e.target.value||0; calc(); });
@@ -3229,32 +3405,39 @@ function lfMaterialPrice(matState){
   const opt = opts.find(o=>o.nama===matState.nama);
   if(!opt) return {total:0, label:'-', sub:''};
   const qty = Math.max(1, Math.floor(matState.qty||1));
+  const descSuffix = matState.desc && matState.desc.trim() ? ` — ${matState.desc.trim()}` : '';
+  let result;
   if(opt.kind==='akrilik'){
     if(matState.akrilikMode==='set'){
       const total = (matState.akrilikSetPrice||0)*qty;
-      return {total, label:`${opt.nama} (Harga Set)`, sub:`${rp(matState.akrilikSetPrice||0)} × ${qty} pcs`};
+      result = {total, label:`${opt.nama} (Harga Set)`, sub:`${rp(matState.akrilikSetPrice||0)} × ${qty} pcs`};
+    } else {
+      const pj=Math.max(0,matState.aw||0), lb=Math.max(0,matState.ah||0);
+      const defaultRate = matState.shape==='custom' ? opt.ref.harga_custom_per_cm2 : opt.ref.harga_kotak_per_cm2;
+      const rate = matState.akrilikRate!=null ? matState.akrilikRate : defaultRate;
+      const area=pj*lb;
+      const total = area*rate*qty;
+      result = {total, label:`${opt.nama} (${matState.shape})`, sub:`${pj}×${lb}cm = ${area.toLocaleString('id-ID')} cm² × ${rp(rate)} × ${qty} pcs`};
     }
-    const pj=Math.max(0,matState.aw||0), lb=Math.max(0,matState.ah||0);
-    const defaultRate = matState.shape==='custom' ? opt.ref.harga_custom_per_cm2 : opt.ref.harga_kotak_per_cm2;
-    const rate = matState.akrilikRate!=null ? matState.akrilikRate : defaultRate;
-    const area=pj*lb;
-    const total = area*rate*qty;
-    return {total, label:`${opt.nama} (${matState.shape})`, sub:`${pj}×${lb}cm = ${area.toLocaleString('id-ID')} cm² × ${rp(rate)} × ${qty} pcs`};
-  }
-  if(opt.kind==='board'){
+  } else if(opt.kind==='board'){
     const pj=Math.max(0,matState.bw||0), lb=Math.max(0,matState.bh||0);
     const total = (matState.bprice||0)*qty;
-    return {total, label:`${opt.nama}`, sub:`${pj}×${lb}cm · ${rp(matState.bprice||0)} (manual) × ${qty} pcs`};
-  }
-  if(opt.kind==='whiteboard'){
+    result = {total, label:`${opt.nama}`, sub:`${pj}×${lb}cm · ${rp(matState.bprice||0)} (manual) × ${qty} pcs`};
+  } else if(opt.kind==='whiteboard'){
     const price = matState.whiteboardPrice!=null ? matState.whiteboardPrice : opt.ref.harga_jual;
     const total = (price||0)*qty;
-    return {total, label:`${opt.nama}`, sub:`${rp(price||0)} × ${qty} pcs`};
+    result = {total, label:`${opt.nama}`, sub:`${rp(price||0)} × ${qty} pcs`};
+  } else if(opt.kind==='perset'){
+    const total = (matState.persetPrice||0)*qty;
+    result = {total, label:`${opt.nama} (per Set)`, sub:`${rp(matState.persetPrice||0)} × ${qty} set`};
+  } else {
+    // pen baut
+    const pbPrice = matState.penbautPrice!=null ? matState.penbautPrice : opt.ref.harga;
+    const total = (pbPrice||0)*qty;
+    result = {total, label:`${opt.nama}`, sub:`${rp(pbPrice||0)} × ${qty} pcs`};
   }
-  // pen baut
-  const pbPrice = matState.penbautPrice!=null ? matState.penbautPrice : opt.ref.harga;
-  const total = (pbPrice||0)*qty;
-  return {total, label:`${opt.nama}`, sub:`${rp(pbPrice||0)} × ${qty} pcs`};
+  result.label += descSuffix;
+  return result;
 }
 
 function lfAddComponent(prefillLabel){
@@ -3431,10 +3614,11 @@ function calcLF(){
 
   const subtotal = compTotal;
   const marginPct = state.lf.margin||0;
-  const marginVal = subtotal*(marginPct/100);
-  const afterMargin = subtotal+marginVal;
+  const _mt = applyTargetMargin(subtotal, marginPct);
+  const marginVal = _mt.laba;
+  const afterMargin = _mt.hargaJual;
   if(marginPct>0){
-    lines.push({label:`Margin (${marginPct}%)`, sub:`${rp(subtotal)} × ${marginPct}%`, val:marginVal, isMargin:true});
+    lines.push(...targetMarginLines(subtotal, marginPct));
   }
   const diskonPct = state.lf.diskon||0;
   const diskonVal = afterMargin*(diskonPct/100);
@@ -3530,10 +3714,11 @@ function calcBrosur(){
 
   const subtotal = compTotal;
   const marginPct = state.brosur.margin||0;
-  const marginVal = subtotal*(marginPct/100);
-  const afterMargin = subtotal+marginVal;
+  const _mt = applyTargetMargin(subtotal, marginPct);
+  const marginVal = _mt.laba;
+  const afterMargin = _mt.hargaJual;
   if(marginPct>0){
-    lines.push({label:`Margin (${marginPct}%)`, sub:`${rp(subtotal)} × ${marginPct}%`, val:marginVal, isMargin:true});
+    lines.push(...targetMarginLines(subtotal, marginPct));
   }
   const diskonPct = state.brosur.diskon||0;
   const diskonVal = afterMargin*(diskonPct/100);
@@ -3627,10 +3812,11 @@ function calcKN(){
 
   const subtotal = compTotal+finTotal;
   const marginPct = state.kn.margin||0;
-  const marginVal = subtotal*(marginPct/100);
-  const afterMargin = subtotal+marginVal;
+  const _mt = applyTargetMargin(subtotal, marginPct);
+  const marginVal = _mt.laba;
+  const afterMargin = _mt.hargaJual;
   if(marginPct>0){
-    lines.push({label:`Margin (${marginPct}%)`, sub:`${rp(subtotal)} × ${marginPct}%`, val:marginVal, isMargin:true});
+    lines.push(...targetMarginLines(subtotal, marginPct));
   }
   const diskonPct = state.kn.diskon||0;
   const diskonVal = afterMargin*(diskonPct/100);
@@ -4831,10 +5017,11 @@ function calcOffset(){
 
   const subtotal = compTotal+finTotal;
   const marginPct = state.offset.margin||0;
-  const marginVal = subtotal*(marginPct/100);
-  const afterMargin = subtotal+marginVal;
+  const _mt = applyTargetMargin(subtotal, marginPct);
+  const marginVal = _mt.laba;
+  const afterMargin = _mt.hargaJual;
   if(marginPct>0){
-    lines.push({label:`Margin (${marginPct}%)`, sub:`${rp(subtotal)} × ${marginPct}%`, val:marginVal, isMargin:true});
+    lines.push(...targetMarginLines(subtotal, marginPct));
   }
   const diskonPct = state.offset.diskon||0;
   const diskonVal = afterMargin*(diskonPct/100);
@@ -4851,6 +5038,8 @@ function calc(){
   const r = mode==='a3' ? calcA3() : mode==='lf' ? calcLF() : mode==='brosur' ? calcBrosur() : mode==='kn' ? calcKN() : mode==='cp' ? calcCP() : calcOffset();
   lastResult=r;
   if(!r){ $('#r-total').textContent='Rp 0'; $('#r-per').textContent=''; return; }
+  // Total Gabungan dibulatkan ke atas ke kelipatan Rp1.000 terdekat (hindari sisa satuan rupiah)
+  r.grand = Math.ceil(r.grand/1000)*1000;
   $('#r-total').textContent = rp(r.grand);
   const qtyOrder = state[mode].qtyOrder||1;
   const qtyOrderUnit = state[mode].qtyOrderUnit||'Pcs';
@@ -4903,6 +5092,11 @@ function renderBreakdown(){
     html += `<div class="brk-desc">${jenisOrder}</div>`;
   }
   r.lines.forEach(l=>{
+    if(l.dispText!=null){
+      html+=`<div class="brk" style="color:var(--ink-2);font-size:12.5px"><span>${l.label}</span><span class="v">${l.dispText}</span></div>`;
+      if(l.sub) html+=`<div class="brk sub"><span>${l.sub}</span><span class="v"></span></div>`;
+      return;
+    }
     if(l.isHeader){
       html+=`<div class="brk" style="color:var(--ink-2);font-weight:700;border-top:1px solid var(--line);margin-top:10px;padding-top:10px"><span>${l.label}</span><span class="v"></span></div>`;
       if(l.sub) html+=`<div class="brk sub"><span>${l.sub}</span><span class="v"></span></div>`;
@@ -5389,9 +5583,10 @@ function calcCP(){
 
   const subtotal = compTotal;
   const marginPct = state.cp.margin||0;
-  const marginVal = subtotal*(marginPct/100);
-  const afterMargin = subtotal+marginVal;
-  if(marginPct>0) lines.push({label:`Margin (${marginPct}%)`, sub:`${rp(subtotal)} × ${marginPct}%`, val:marginVal, isMargin:true});
+  const _mt = applyTargetMargin(subtotal, marginPct);
+  const marginVal = _mt.laba;
+  const afterMargin = _mt.hargaJual;
+  if(marginPct>0) lines.push(...targetMarginLines(subtotal, marginPct));
   const diskonPct = state.cp.diskon||0;
   const diskonVal = afterMargin*(diskonPct/100);
   const grand = afterMargin-diskonVal;
@@ -5430,9 +5625,86 @@ function syncFinishingGabunganQty(containerSel, finMap, newQty){
   });
 }
 
-$('#lf-qty-order').addEventListener('input', e=>{ state.lf.qtyOrder=Math.max(1,+e.target.value||1); calc(); });
+$('#lf-qty-order').addEventListener('input', e=>{
+  state.lf.qtyOrder=Math.max(1,+e.target.value||1);
+  // Qty Order jadi acuan -- sinkron live ke Jumlah (pcs)/(unit) semua komponen,
+  // supaya Total & Harga Satuan konsisten (tidak dibagi angka yg beda dari yg dihitung).
+  document.querySelectorAll('#lf-components .comp-card').forEach(node=>{
+    const candidates = [node.querySelector('.lfc-qty-outdoor'), node.querySelector('.lfc-qty-indoor'), node.querySelector('.lfc-qty')];
+    const qtyInp = candidates.find(el=>el && el.offsetParent!==null);
+    if(qtyInp && +qtyInp.value !== state.lf.qtyOrder){
+      qtyInp.value = state.lf.qtyOrder;
+      qtyInp.dispatchEvent(new Event('input'));
+    }
+  });
+  calc();
+});
 $('#lf-qty-order-unit').addEventListener('change', e=>{ state.lf.qtyOrderUnit=e.target.value; calc(); });
 $('#lf-add-comp').addEventListener('click', ()=>{ lfAddComponent(''); calc(); });
+
+// ===== Order Description: Jenis Order/Sub Varian jadi "remote control" utk Komponen #1 =====
+// (Item ke-2 dst tetap pakai selector Jenis Order di masing2 kartu Komponen Cetak sendiri.)
+function lfFirstCompNode(){
+  return document.querySelector('#lf-components .comp-card:first-child');
+}
+$('#lf-jenisorder').innerHTML = `<option value="">— Pilih Jenis Order —</option>` +
+  LF_JENIS_ORDER_URUTAN.map(k=>`<option value="${k}">${LF_JENIS_ORDER[k].label}</option>`).join('');
+$('#lf-jenisorder').addEventListener('change', e=>{
+  const key = e.target.value;
+  const node = lfFirstCompNode();
+  if(!node) return;
+  const svWrap = $('#lf-subvarian-wrap');
+  const svSel = $('#lf-subvarian');
+  const topWrap = $('#lf-topping-wrap');
+  topWrap.style.display = 'none';
+  const def = LF_JENIS_ORDER[key];
+  const subKeys = def ? Object.keys(def.subVarian) : [];
+  if(!def || subKeys.length===0){
+    svWrap.style.display='none';
+    svSel.innerHTML='';
+    return;
+  }
+  svWrap.style.display='';
+  svSel.innerHTML = `<option value="">— Pilih Sub Varian —</option>` +
+    subKeys.map(sk=>`<option value="${sk}">${def.subVarian[sk].label}</option>`).join('');
+});
+$('#lf-subvarian').addEventListener('change', e=>{
+  const node = lfFirstCompNode();
+  if(!node) return;
+  const compState = state.lf.components.get(node.dataset.id);
+  const jenisKey = $('#lf-jenisorder').value;
+  const def = LF_JENIS_ORDER[jenisKey];
+  lfApplySubVarianTo(node, compState, jenisKey, e.target.value);
+
+  const topWrap = $('#lf-topping-wrap');
+  const topSel = $('#lf-topping');
+  if(def && def.hasToppingChoice && compState.bahan){
+    const b = lfCurBahan(compState);
+    if(b){
+      const priceKey = compState.price==='divisi' ? 'divisi' : 'umum';
+      const opts = Object.entries(b[priceKey]||{}).filter(([k,v])=>v!=null).map(([k])=>k);
+      const fallbackOpts = Object.entries(b.umum||{}).filter(([k,v])=>v!=null).map(([k])=>k);
+      const list = opts.length ? opts : fallbackOpts;
+      topWrap.style.display='';
+      topSel.innerHTML = list.map(o=>`<option value="${o}">${o==='Rangka' ? 'Rangka Saja' : 'Rangka + '+o}</option>`).join('');
+      // remote otomatis nilai default ke Komponen Cetak sekali di awal
+      const compTopSel = node.querySelector('.lfc-rangka-opt');
+      if(compTopSel){ topSel.value = compTopSel.value; }
+    }
+  } else {
+    topWrap.style.display='none';
+  }
+});
+$('#lf-topping').addEventListener('change', e=>{
+  const node = lfFirstCompNode();
+  if(!node) return;
+  const compTopSel = node.querySelector('.lfc-rangka-opt');
+  if(!compTopSel) return;
+  compTopSel.value = e.target.value;
+  compTopSel.dispatchEvent(new Event('change'));
+});
+
+
 
 // Brosur component wiring
 $('#brosur-nama').addEventListener('input', e=>{ state.brosur.nama=e.target.value; });
