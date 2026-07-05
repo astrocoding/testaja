@@ -759,6 +759,20 @@ select:focus,input:focus{outline:none;border-color:var(--accent);box-shadow:0 0 
         <label>Varian</label>
         <select id="offset-varian"></select>
       </div>
+      <div class="field" id="offset-ukuran-wrap" style="display:none">
+        <label>Ukuran</label>
+        <select id="offset-ukuran"></select>
+        <div class="row2 ukuran-custom-wrap" id="offset-ukuran-custom-wrap" style="display:none;margin-top:8px">
+          <div class="field" style="margin:0">
+            <label>Lebar Jadi (cm)</label>
+            <input type="number" id="offset-ukuran-lebar" min="0" step="0.1" inputmode="decimal">
+          </div>
+          <div class="field" style="margin:0">
+            <label>Tinggi Jadi (cm)</label>
+            <input type="number" id="offset-ukuran-tinggi" min="0" step="0.1" inputmode="decimal">
+          </div>
+        </div>
+      </div>
       <div class="row2">
         <div class="field">
           <label>Qty Order</label>
@@ -1072,8 +1086,12 @@ select:focus,input:focus{outline:none;border-color:var(--accent);box-shadow:0 0 
       <label>Pilih Bentuk</label>
       <div class="seg cpc-bentuk">
         <button data-v="booklet" class="on">Booklet</button>
+        <button data-v="lipat2">Lipat 2</button>
         <button data-v="lipat3">Lipat 3</button>
-        <button data-v="lipat4">Lipat 4</button>
+        <button data-v="softcover_jilid_lem">Softcover Jilid Lem</button>
+        <button data-v="softcover_spiral">Softcover Spiral</button>
+        <button data-v="hardcover_full">Hardcover Full</button>
+        <button data-v="hardcover_spiral">Hardcover Spiral</button>
       </div>
       <div class="note" style="margin-top:6px">Booklet = Lipat 2 (Steples) atau Buku Lepas (Spiral), ditentukan dari pilihan Finishing. Lipat 3/4 = 1 lembar berjejer, cetak Offset.</div>
     </div>
@@ -1155,6 +1173,7 @@ select:focus,input:focus{outline:none;border-color:var(--accent);box-shadow:0 0 
         <button data-v="steples" class="on">Steples</button>
         <button data-v="spiral">Spiral</button>
         <button data-v="lempanas">Lem Panas</button>
+        <button data-v="hardcover">Hardcover</button>
       </div>
       <div class="field cpc-steples-manual-wrap" style="margin-top:10px">
         <label>Harga Steples (manual, per pcs — belum ada tabel resmi)</label>
@@ -1848,10 +1867,10 @@ const JENIS_ORDER_A3 = {
   },
 
   buku_modul: {
-    label: "Buku / Modul",
+    label: "Buku / Modul / Majalah / Notebook / Agenda",
     fields: [
       { key: "ukuran", label: "Ukuran", type: "select", required: true,
-        options: ["A4 (21×29.7cm)", "A5 (14.8×21cm)", "B5 (17.6×25cm)", "Custom"] },
+        options: ["A4 (21×29.7cm)", "B5 (17.6×25cm)", "A5 (14.8×21cm)", "B6 (12.5×17.6cm)", "A6 (10.5×14.8cm)", "F4 (21×33cm)", "Custom"] },
       { key: "jumlah_halaman", label: "Jumlah Halaman", type: "number", required: true, default: 50 },
       { key: "bahan_cover", label: "Bahan Cover", type: "select", required: true,
         options: ["Art Carton 260 gr", "Art Carton 310 gr", "Custom"] },
@@ -1861,7 +1880,7 @@ const JENIS_ORDER_A3 = {
       { key: "laminasi_cover", label: "Laminasi Cover", type: "select", required: false,
         options: ["Tanpa", "Glossy", "Doff"] },
       { key: "binding", label: "Binding", type: "select", required: true,
-        options: ["Jahit Kawat (Steples)", "Lem Panas (Perfect Binding)", "Jahit Benang", "Hardcover"] }
+        options: ["Softcover Jilid Lem", "Softcover Steples Tengah", "Softcover Spiral", "Softcover Jahit Benang", "Hardcover Full", "Hardcover Spiral"] }
     ],
     autoComponents: ["Cover", "Isi"]
   },
@@ -4087,6 +4106,275 @@ const OFFSET_FIELD_LIBRARY = {
   jenis_form:          { label: "Jenis Form",                  type: "select", options: ["Single (Lembar Biasa)", "NCR (Rangkap)"] }
 };
 
+  /**
+ * ============================================================================
+ * PRINTOS — DATABASE PRODUK: BUKU (OFFSET)
+ * Workflow: Jenis Order -> Variasi Produksi -> Ukuran -> Material Cover
+ *           -> Material Isi -> Spesifikasi Produk -> Finishing
+ *           -> Komponen Otomatis -> Costing
+ *
+ * INI MURNI STRUKTUR DATA -- belum ada kode UI/HTML.
+ * ============================================================================
+ *
+ *
+ * ============================================================================
+ * CATATAN REVIEW WORKFLOW (dari sisi praktik produksi offset)
+ * ============================================================================
+ *
+ * 1) "Variasi Produksi" di brief awal mencampur 2 DIMENSI YANG BERBEDA:
+ *      - JENIS COVER   : Soft Cover / Hard Cover
+ *      - JENIS BINDING : Perfect Binding / Steples Tengah / Spiral / Jahit Benang
+ *
+ *    Di produksi nyata, dua hal ini adalah keputusan yang TERPISAH tapi SALING
+ *    TERKAIT -- Soft Cover bisa dipasangkan dengan Perfect Binding ATAU Steples
+ *    ATAU Spiral ATAU Jahit Benang. Sedangkan Hard Cover HAMPIR SELALU berarti
+ *    proses casebound (Jahit Benang lalu di-lem ke board), meski Hardcover +
+ *    Spiral juga umum dipakai khusus utk planner/notebook/kalender.
+ *
+ *    Kalau "Soft Cover" dan "Perfect Binding" didaftar sbg 2 opsi TERPISAH yg
+ *    sejajar (seperti di brief awal), admin bisa pilih keduanya sekaligus atau
+ *    pilih salah satu tanpa yang lain jelas -- ini ambigu dan berisiko salah
+ *    hitung komponen (misal pilih "Soft Cover" doang, sistem tidak tahu mau
+ *    dijilid pakai apa).
+ *
+ *    REKOMENDASI: gabungkan jadi 1 daftar "Variasi Produksi" berisi
+ *    KOMBINASI Cover+Binding yg REALISTIS dipakai di lapangan (persis pola yg
+ *    sudah dipakai di tab Company Profile: "Softcover Jilid Lem", "Softcover
+ *    Spiral", "Hardcover Full", "Hardcover Spiral" -- supaya konsisten satu
+ *    aplikasi). Ini yang dipakai di struktur di bawah (7 opsi, sama seperti
+ *    jumlah asli, cuma dipasangkan dengan benar).
+ *
+ * 2) SETIAP variasi produksi punya BATASAN JUMLAH HALAMAN yang REALISTIS
+ *    secara produksi -- ini penting utk validasi supaya admin tidak salah
+ *    pilih kombinasi yang secara fisik tidak masuk akal:
+ *      - Steples Tengah   : maks ~80 halaman (tergantung gramasi isi) --
+ *                           lebih tebal dari itu, staples tidak bisa menembus
+ *                           lipatan dgn rapi.
+ *      - Perfect Binding  : minimal ~40 halaman -- di bawah itu, lem
+ *                           punggung buku tidak cukup pegangan & halaman
+ *                           gampang lepas.
+ *      - Jahit Benang     : minimal ~40 halaman (mirip Perfect Binding,
+ *                           biasanya dipakai justru utk buku LEBIH tebal yg
+ *                           butuh daya tahan ekstra).
+ *      - Spiral           : praktis tidak ada batas atas/bawah yg ketat.
+ *      - Hardcover        : idealnya minimal ~32 halaman -- di bawah itu,
+ *                           proporsi & biaya hardcover jadi kurang masuk akal
+ *                           dibanding isi yg tipis.
+ *    Field `constraints` di tiap variasi di bawah mengkodekan batasan ini,
+ *    supaya nanti UI bisa kasih peringatan (bukan larangan keras -- tetap
+ *    bisa dipaksakan kalau admin yakin, cuma diingatkan).
+ *
+ * 3) MATERIAL COVER vs ISI: saya pakai nama yg PERSIS SAMA dengan katalog
+ *    Kertas Offset yang sudah ada di aplikasi (bukan nama baru), supaya nanti
+ *    saat wiring UI, dropdown-nya otomatis nyambung tanpa perlu mapping nama
+ *    ulang. Gramasi yg dicantumkan adalah yg paling umum dipakai di
+ *    percetakan offset Indonesia utk masing-masing peruntukan.
+ *
+ * 4) HARDCOVER butuh 2 material TAMBAHAN yang tidak dibutuhkan Softcover:
+ *      - Board (karton tebal/chipboard) -- rangka kaku di balik cover
+ *      - Endpaper -- kertas polos yang merekatkan blok isi ke board cover
+ *    Field-field ini saya taruh terpisah (`fieldsHardcoverOnly`) supaya nanti
+ *    UI cuma menampilkannya kalau Variasi Produksi = salah satu varian
+ *    Hardcover (sesuai prinsip "field mengikuti pilihan").
+ *
+ * 5) "Warna Cover" & "Warna Isi" dari contoh field Anda saya pertahankan
+ *    sebagai field TERPISAH dari Material -- ini penting karena 1 material yg
+ *    sama (misal HVS 80gr) bisa dicetak Full Color ATAU 1 Warna, dan itu
+ *    mempengaruhi biaya cetak isi secara signifikan (beda plat/mesin).
+ * ============================================================================
+ */
+
+const OFFSET_BUKU_FIELD_LIBRARY = {
+  qty:                { label: "Qty Order",                type: "number" },
+  ukuran:              { label: "Ukuran",                   type: "select", options: "FROM_UKURAN" },
+  ukuran_lebar_custom: { label: "Lebar Jadi (cm)",           type: "number" },
+  ukuran_tinggi_custom:{ label: "Tinggi Jadi (cm)",          type: "number" },
+  jumlah_halaman_isi:  { label: "Jumlah Halaman Isi",         type: "number" },
+
+  material_cover:      { label: "Material Cover",             type: "select", options: "FROM_MATERIAL_COVER" },
+  gramasi_cover:       { label: "Gramasi Cover",               type: "select", options: "FROM_GRAMASI_COVER" },
+  material_isi:        { label: "Material Isi",                type: "select", options: "FROM_MATERIAL_ISI" },
+  gramasi_isi:         { label: "Gramasi Isi",                  type: "select", options: "FROM_GRAMASI_ISI" },
+
+  warna_cover:         { label: "Warna Cover",                  type: "select", options: ["Full Color (4 Warna)", "1 Warna (Mono)"] },
+  warna_isi:           { label: "Warna Isi",                    type: "select", options: ["Full Color (4 Warna)", "1 Warna (Mono)", "2 Warna"] },
+
+  laminasi:            { label: "Laminasi Cover",              type: "select", options: ["Tanpa", "Glossy", "Doff"] },
+  spot_uv:             { label: "Spot UV",                      type: "toggle" },
+  foil:                { label: "Foil",                         type: "toggle" },
+  emboss:              { label: "Emboss",                       type: "toggle" },
+  shrink:              { label: "Shrink Wrap",                  type: "toggle" },
+  numbering:           { label: "Numbering",                    type: "toggle" },
+  pembatas_buku:       { label: "Pembatas Buku (Ribbon)",       type: "toggle" },
+  pocket:              { label: "Pocket (Kantong Belakang)",    type: "toggle" },
+  insert:              { label: "Insert (Sisipan Lepas)",       type: "toggle" },
+
+  // Khusus Hardcover
+  material_board:      { label: "Material Board (Chipboard)",  type: "select", options: "FROM_MATERIAL_BOARD" },
+  material_endpaper:   { label: "Material Endpaper",            type: "select", options: "FROM_MATERIAL_ENDPAPER" }
+};
+
+const OFFSET_BUKU = {
+
+  jenisOrder: "buku",
+  label: "Buku",
+
+  // ==== VARIASI PRODUKSI: kombinasi Cover+Binding yg realistis (lihat catatan review #1) ====
+  variasiProduksi: {
+
+    softcover_lem: {
+      label: "Softcover — Perfect Binding (Jilid Lem Panas)",
+      deskripsi: "Cover lunak, isi dijilid dgn lem panas di bagian punggung. Paling umum utk buku teks/novel/panduan.",
+      constraints: { minHalamanIsi: 40, maxHalamanIsi: null,
+        catatan: "Minimal ±40 halaman isi agar lem punggung buku merekat sempurna." },
+      komponenOtomatis: ["Cover", "Isi", "Lem Panas", "Laminasi Cover", "Potong", "Finishing"]
+    },
+
+    softcover_steples: {
+      label: "Softcover — Steples Tengah",
+      deskripsi: "Dijepret kawat staples di tengah lipatan. Utk buku/majalah tipis.",
+      constraints: { minHalamanIsi: 8, maxHalamanIsi: 80,
+        catatan: "Maks ±80 halaman isi (tergantung gramasi) -- lebih tebal, staples sulit menembus rapi." },
+      komponenOtomatis: ["Cover", "Isi", "Steples", "Potong", "Finishing"]
+    },
+
+    softcover_spiral: {
+      label: "Softcover — Spiral / Wire-O",
+      deskripsi: "Dijilid kawat/plastik spiral melalui lubang di sisi buku. Bisa dibuka rata 180°.",
+      constraints: { minHalamanIsi: 8, maxHalamanIsi: null, catatan: null },
+      komponenOtomatis: ["Cover", "Isi", "Spiral", "Punch (Lubang)", "Potong", "Finishing"]
+    },
+
+    softcover_jahitbenang: {
+      label: "Softcover — Jahit Benang",
+      deskripsi: "Isi dijahit benang per section lalu di-lem ke cover lunak. Lebih awet dari perfect binding biasa.",
+      constraints: { minHalamanIsi: 40, maxHalamanIsi: null,
+        catatan: "Umumnya dipakai justru utk buku yg LEBIH tebal & butuh daya tahan ekstra." },
+      komponenOtomatis: ["Cover", "Isi", "Jahit Benang", "Lem Panas", "Potong", "Finishing"]
+    },
+
+    hardcover_full: {
+      label: "Hardcover — Jahit Benang",
+      deskripsi: "Proses hardcover standar/klasik: isi dijahit benang, dipasang ke board tebal berlapis cover.",
+      constraints: { minHalamanIsi: 32, maxHalamanIsi: null,
+        catatan: "Idealnya minimal ±32 halaman -- di bawah itu, proporsi & biaya hardcover kurang sepadan dgn isi." },
+      komponenOtomatis: ["Cover", "Isi", "Board", "Endpaper", "Jahit Benang", "Laminasi Cover", "Hardcover Process", "Potong"]
+    },
+
+    hardcover_spiral: {
+      label: "Hardcover — Spiral",
+      deskripsi: "Cover keras dgn isi dijilid spiral (bukan casebound). Umum utk planner/notebook/kalender premium.",
+      constraints: { minHalamanIsi: 8, maxHalamanIsi: null, catatan: null },
+      komponenOtomatis: ["Cover", "Isi", "Board", "Endpaper", "Spiral", "Punch (Lubang)", "Laminasi Cover", "Potong"]
+    },
+
+    custom: {
+      label: "Custom",
+      deskripsi: "Kombinasi di luar 6 opsi standar di atas -- isi manual.",
+      constraints: null,
+      komponenOtomatis: []
+    }
+  },
+  variasiProduksiUrutan: ["softcover_lem", "softcover_steples", "softcover_spiral", "softcover_jahitbenang", "hardcover_full", "hardcover_spiral", "custom"],
+
+  // ==== UKURAN STANDAR ====
+  ukuran: [
+    { key: "a4",      label: "A4 (21 × 29,7 cm)",       w: 21,   h: 29.7 },
+    { key: "b5",      label: "B5 (17,6 × 25 cm)",        w: 17.6, h: 25 },
+    { key: "a5",      label: "A5 (14,8 × 21 cm)",        w: 14.8, h: 21 },
+    { key: "b6",      label: "B6 (12,5 × 17,6 cm)",      w: 12.5, h: 17.6 },
+    { key: "a6",      label: "A6 (10,5 × 14,8 cm)",      w: 10.5, h: 14.8 },
+    { key: "f4",      label: "F4 (21 × 33 cm)",          w: 21,   h: 33 },
+    { key: "square15",label: "Square 15 × 15 cm",         w: 15,   h: 15 },
+    { key: "square20",label: "Square 20 × 20 cm",         w: 20,   h: 20 },
+    { key: "custom",  label: "Custom",                    w: null, h: null }
+  ],
+  // Kalau ukuran==="custom", tampilkan 2 input field ini (sesuai arahan):
+  ukuranCustomFields: ["ukuran_lebar_custom", "ukuran_tinggi_custom"],
+
+  // ==== MATERIAL COVER (standar offset + gramasi umum) ====
+  materialCover: [
+    { nama: "Art Carton 210 gr", catatan: "Paling umum, ekonomis" },
+    { nama: "Art Carton 230 gr", catatan: null },
+    { nama: "Art Carton 260 gr", catatan: "Pilihan populer utk cover standar" },
+    { nama: "Art Carton 310 gr", catatan: "Lebih tebal/kaku, cocok cover premium" }
+  ],
+
+  // ==== MATERIAL ISI (standar offset + gramasi umum, dikelompokkan per peruntukan) ====
+  // CATATAN: "HVS 70gsm"/"HVS 80gsm" di sini masih nama GENERIK -- katalog Kertas Offset
+  // yg sudah ada di aplikasi TERNYATA belum punya entri HVS polos tanpa merek/plano
+  // spesifik (yg ada cuma varian per-merek spt "HVS 70 gr F4 Sinar Dunia"). Perlu
+  // dikonfirmasi ke Anda merek/varian mana yg jadi acuan standar sebelum wiring UI,
+  // supaya auto-filter bahan bisa 100% nyambung (sama seperti kasus serupa di
+  // struktur Jenis Order Offset yg 18-kategori sebelumnya).
+  materialIsi: [
+    { nama: "HVS 70gsm",     kelompok: "Teks/1 Warna", catatan: "Umum utk buku teks, novel ekonomis" },
+    { nama: "HVS 80gsm",     kelompok: "Teks/1 Warna", catatan: "Sedikit lebih tebal dari 70gr" },
+    { nama: "Book Paper 70gr", kelompok: "Novel/Teks", catatan: "Kertas krem, nyaman dibaca, umum utk novel" },
+    { nama: "Book Paper 90gr", kelompok: "Novel/Teks", catatan: null },
+    { nama: "Art Paper 100 gr", kelompok: "Full Color/Gambar", catatan: "Utk isi bergambar/majalah, permukaan licin" },
+    { nama: "Art Paper 120 gr", kelompok: "Full Color/Gambar", catatan: "Paling umum utk buku full color" },
+    { nama: "Art Paper 150 gr", kelompok: "Full Color/Gambar", catatan: "Lebih tebal, kesan premium" }
+  ],
+
+  // ==== MATERIAL KHUSUS HARDCOVER ====
+  materialBoard: [
+    { nama: "Karton Kraft 200", catatan: "Board standar/ekonomis" },
+    { nama: "Karton Kraft 275", catatan: "Paling umum dipakai utk board hardcover" },
+    { nama: "Karton Kraft 310", catatan: "Board tebal, hardcover ukuran besar/berat" }
+  ],
+  materialEndpaper: [
+    { nama: "HVS 100 gr", catatan: "Endpaper polos standar" },
+    { nama: "Art Paper 120 gr", catatan: "Kalau endpaper mau dicetak warna/pattern" }
+  ],
+
+  // ==== SPESIFIKASI PRODUK: field wajib vs opsional ====
+  fieldsWajib: [
+    "qty", "ukuran", "jumlah_halaman_isi",
+    "material_cover", "gramasi_cover", "material_isi", "gramasi_isi",
+    "warna_cover", "warna_isi"
+  ],
+  fieldsOpsional: [
+    "laminasi", "spot_uv", "foil", "emboss", "shrink",
+    "numbering", "pembatas_buku", "pocket", "insert"
+  ],
+  // Field TAMBAHAN yang HANYA muncul kalau Variasi Produksi termasuk kelompok Hardcover
+  // (hardcover_full / hardcover_spiral) -- sesuai prinsip "field mengikuti pilihan produk"
+  fieldsHardcoverOnly: ["material_board", "material_endpaper"],
+  variasiHardcover: ["hardcover_full", "hardcover_spiral"]
+
+};
+
+if (typeof module !== "undefined" && module.exports) {
+  module.exports = { OFFSET_BUKU_FIELD_LIBRARY, OFFSET_BUKU };
+}
+
+// ==== Company Profile (Offset) -- 7 Varian sama seperti di tab A3+/CP, biar konsisten ====
+const OFFSET_CP = {
+  variasi: {
+    lipat2: { label: "Lipat 2", tipe: "lipat", komponenOtomatis: ["Body", "Potong"] },
+    lipat3: { label: "Lipat 3", tipe: "lipat", komponenOtomatis: ["Body", "Potong"] },
+    booklet: { label: "Booklet", tipe: "coverisi", finishing: "Steples", komponenOtomatis: ["Cover", "Isi", "Steples", "Potong"] },
+    softcover_jilid_lem: { label: "Softcover Jilid Lem", tipe: "coverisi", finishing: "Lem Panas Buku (Softcover) (Otomatis)", komponenOtomatis: ["Cover", "Isi", "Lem Panas", "Laminasi Cover", "Potong"] },
+    softcover_spiral: { label: "Softcover Spiral", tipe: "coverisi", finishing: "Spiral (Otomatis)", komponenOtomatis: ["Cover", "Isi", "Spiral", "Punch (Lubang)", "Potong"] },
+    hardcover_full: { label: "Hardcover Full", tipe: "coverisi", finishing: "Hardcover", komponenOtomatis: ["Cover", "Isi", "Board", "Endpaper", "Hardcover Process", "Potong"] },
+    hardcover_spiral: { label: "Hardcover Spiral", tipe: "coverisi", finishing: "Spiral (Otomatis)", komponenOtomatis: ["Cover", "Isi", "Board", "Endpaper", "Spiral", "Punch (Lubang)", "Potong"] }
+  },
+  variasiUrutan: ["lipat2", "lipat3", "booklet", "softcover_jilid_lem", "softcover_spiral", "hardcover_full", "hardcover_spiral"],
+  ukuran: [
+    { key: "a4", label: "A4 (21 × 29,7 cm)", w: 21, h: 29.7 },
+    { key: "a5", label: "A5 (14,8 × 21 cm)", w: 14.8, h: 21 },
+    { key: "f4", label: "F4 (21 × 33 cm)", w: 21, h: 33 },
+    { key: "custom", label: "Custom", w: null, h: null }
+  ],
+  materialCover: [
+    { nama: "Art Carton 260 gr" }, { nama: "Art Carton 310 gr" }
+  ],
+  materialIsi: [
+    { nama: "Art Paper 120 gr" }, { nama: "Art Paper 150 gr" }, { nama: "HVS 100gsm" }
+  ]
+};
+
 const OFFSET_JENIS_ORDER = {
 
   brosur_flyer_leaflet: {
@@ -4106,10 +4394,15 @@ const OFFSET_JENIS_ORDER = {
 
   company_profile_katalog: {
     label: "Company Profile / Katalog",
+    isCPDetailed: true,
     varian: {
-      softcover_kawat: { label: "Softcover Jilid Kawat", subVarian: null },
-      softcover_lem:   { label: "Softcover Jilid Lem", subVarian: null },
-      hardcover:       { label: "Hardcover", subVarian: null }
+      lipat2: { label: "Lipat 2", subVarian: null },
+      lipat3: { label: "Lipat 3", subVarian: null },
+      booklet: { label: "Booklet", subVarian: null },
+      softcover_jilid_lem: { label: "Softcover Jilid Lem", subVarian: null },
+      softcover_spiral: { label: "Softcover Spiral", subVarian: null },
+      hardcover_full: { label: "Hardcover Full", subVarian: null },
+      hardcover_spiral: { label: "Hardcover Spiral", subVarian: null }
     },
     material: ["Art Carton 260 gr", "Art Carton 310 gr", "Art Paper 120 gr", "Art Paper 150 gr", "HVS 100gsm"],
     ukuran: ["A4", "A5", "Custom"],
@@ -4118,13 +4411,18 @@ const OFFSET_JENIS_ORDER = {
     komponenOtomatis: ["Cover", "Isi", "Binding", "Laminasi", "Finishing"]
   },
 
-  buku_modul_majalah: {
-    label: "Buku / Modul / Majalah",
+
+buku_modul_majalah: {
+    label: "Buku / Modul / Majalah / Notebook / Agenda",
+    isBukuDetailed: true,
     varian: {
-      softcover: { label: "Softcover", subVarian: null },
-      hardcover: { label: "Hardcover", subVarian: null },
-      majalah:   { label: "Majalah", subVarian: null },
-      modul:     { label: "Modul", subVarian: null }
+      softcover_lem: { label: "Softcover — Perfect Binding (Jilid Lem Panas)", subVarian: null },
+      softcover_steples: { label: "Softcover — Steples Tengah", subVarian: null },
+      softcover_spiral: { label: "Softcover — Spiral / Wire-O", subVarian: null },
+      softcover_jahitbenang: { label: "Softcover — Jahit Benang", subVarian: null },
+      hardcover_full: { label: "Hardcover — Jahit Benang", subVarian: null },
+      hardcover_spiral: { label: "Hardcover — Spiral", subVarian: null },
+      custom: { label: "Custom", subVarian: null }
     },
     material: ["Art Paper 120 gr", "Art Paper 150 gr", "HVS 70gsm", "HVS 80gsm", "Book Paper 70gr", "Book Paper 90gr", "Art Carton 260 gr", "Art Carton 310 gr"],
     ukuran: ["A4", "A5", "B5", "Custom"],
@@ -5706,11 +6004,24 @@ function cpAddComponent(){
   const bookletWraps = node.querySelectorAll('.cpc-booklet-wrap');
   const lipat34Wrap = node.querySelector('.cpc-lipat34-wrap');
   const bentukSeg = node.querySelector('.cpc-bentuk');
+  const CP_BOOKLET_LIKE = new Set(['booklet','softcover_jilid_lem','softcover_spiral','hardcover_full','hardcover_spiral']);
+  const CP_FINGAB_PRESET = {
+    softcover_jilid_lem: 'lempanas',
+    softcover_spiral: 'spiral',
+    hardcover_full: 'hardcover',
+    hardcover_spiral: 'hardcover'
+  };
   function refreshBentuk(){
-    const isBooklet = compState.bentuk==='booklet';
+    const isBooklet = CP_BOOKLET_LIKE.has(compState.bentuk);
     bookletWraps.forEach(w=>{ w.style.display = isBooklet ? '' : 'none'; });
     lipat34Wrap.style.display = isBooklet ? 'none' : '';
     if(!isBooklet) refreshL34Mesin();
+    const preset = CP_FINGAB_PRESET[compState.bentuk];
+    if(preset){
+      const finSeg = node.querySelector('.cpc-finishing');
+      const btn = finSeg && finSeg.querySelector(`button[data-v="${preset}"]`);
+      if(btn) btn.click();
+    }
   }
   bentukSeg.addEventListener('click', e=>{
     const btn=e.target.closest('button'); if(!btn) return;
@@ -5820,7 +6131,10 @@ function cpAddComponent(){
   const finSeg = node.querySelector('.cpc-finishing');
   const steplesManualWrap = node.querySelector('.cpc-steples-manual-wrap');
   function refreshFinishingUI(){
-    steplesManualWrap.style.display = compState.finishing==='steples' ? '' : 'none';
+    const isManual = compState.finishing==='steples' || compState.finishing==='hardcover';
+    steplesManualWrap.style.display = isManual ? '' : 'none';
+    const lbl = steplesManualWrap.querySelector('label');
+    if(lbl) lbl.textContent = `Harga ${compState.finishing==='hardcover'?'Hardcover':'Steples'} (manual, per pcs — belum ada tabel resmi)`;
   }
   finSeg.addEventListener('click', e=>{
     const btn=e.target.closest('button'); if(!btn) return;
@@ -5931,10 +6245,11 @@ function cpBookletPrice(comp){
   total += priceMaterial(comp.covProduksi, comp.covMaterial, comp.covMesin, comp.covLam, comp.covLamSisi, comp.covSpotuv, 1, 'Cover');
   total += priceMaterial(comp.isiProduksi, comp.isiMaterial, comp.isiMesin, comp.isiLam, comp.isiLamSisi, false, isiLembarPerBooklet, 'Isi');
 
-  // Finishing Gabungan: Steples (manual) / Spiral / Lem Panas (formula Offset)
-  if(comp.finishing==='steples'){
+  // Finishing Gabungan: Steples/Hardcover (manual) / Spiral / Lem Panas (formula Offset)
+  if(comp.finishing==='steples' || comp.finishing==='hardcover'){
     const t = (comp.steplesManual||0)*qtyOrder;
-    lines.push({label:'Finishing: Steples (manual)', sub:`${rp(comp.steplesManual||0)} × ${qtyOrder} pcs`, val:t});
+    const lbl = comp.finishing==='hardcover' ? 'Hardcover (manual)' : 'Steples (manual)';
+    lines.push({label:`Finishing: ${lbl}`, sub:`${rp(comp.steplesManual||0)} × ${qtyOrder} pcs`, val:t});
     total += t;
   } else {
     const finNama = comp.finishing==='spiral' ? 'Spiral' : 'Lem Panas Buku (Softcover)';
@@ -6151,10 +6466,231 @@ $('#offset-jenisorder').addEventListener('change', e=>{
   sel.innerHTML = `<option value="">— Pilih Varian —</option>` +
     varKeys.map(vk=>`<option value="${vk}">${def.varian[vk].label}</option>`).join('');
 });
+// Rekomendasi Plano paling EFISIEN (biaya per pcs paling murah) utk ukuran jadi tertentu.
+function offsetRecommendPlano(kertasNama, pw, ph){
+  const k = DATA.offset.kertas.find(x=>x.nama===kertasNama);
+  if(!k || !k.varian || !k.varian.length) return null;
+  let best = null;
+  k.varian.forEach((v, idx)=>{
+    const sz = offsetParseSize(v.ukuran);
+    const L1 = offsetLayoutTahap1(sz, pw, ph, 0, false);
+    if(L1.total<=0) return;
+    const isi = v.satuan==='Rim' ? 500 : 1;
+    const costPerPiece = v.harga / (L1.total*isi);
+    if(!best || costPerPiece < best.costPerPiece){
+      best = {idx, up:L1.total, costPerPiece, w:sz.w, h:sz.h, ukuran:v.ukuran, harga:v.harga};
+    }
+  });
+  return best;
+}
+// Rekomendasi Mesin paling EFISIEN utk ukuran jadi tertentu -- brdasarkan yg kasih
+// Up (muatan per lembar cetak) TERBANYAK di area cetaknya (bukan mencocokkan ke ukuran
+// plano mentah, karena plano besar lazimnya dipotong dulu sebelum masuk mesin).
+function offsetRecommendMesinForSize(pw, ph){
+  let best = null;
+  DATA.offset.mesin.filter(m=>m.kategori==='fc').forEach(m=>{
+    const ak = offsetParseSize(m.area_cetak);
+    const L1 = offsetLayoutTahap1(ak, pw, ph, 0, false);
+    if(L1.total<=0) return;
+    if(!best || L1.total>best.up) best = {nama:m.nama, up:L1.total};
+  });
+  return best;
+}
+
+function offsetApplyCPVarian(varianKey, sizeObj){
+  const v = OFFSET_CP.variasi[varianKey];
+  if(!v) return;
+  const qtyOrder = state.offset.qtyOrder||1;
+  const sz = sizeObj || OFFSET_CP.ukuran[0];
+
+  $('#offset-components').innerHTML = '';
+  state.offset.components.clear();
+  $('#offset-finishings').innerHTML = '';
+  state.offset.finishings.clear();
+
+  function buatKomponen(label, materialList){
+    const node = offsetAddComponent();
+    const compState = state.offset.components.get(node.dataset.id);
+    compState.pw = sz.w; compState.ph = sz.h;
+    node.querySelector('.ofc-pw').value = sz.w;
+    node.querySelector('.ofc-ph').value = sz.h;
+    const kertasRow = node.querySelector('.ofc-kertas-rows .kertas-row');
+    const namaList = materialList.map(m=>m.nama);
+    compState._wizardMaterialList = namaList;
+    const sel = kertasRow.querySelector('.ofckr-kertas');
+    Array.from(sel.options).forEach(opt=>{
+      if(opt.value && opt.value!=='__custom__' && !namaList.includes(opt.value)) opt.remove();
+    });
+    const recommended = Array.from(sel.options).find(o=>o.value && o.value!=='__custom__');
+    if(recommended){
+      compState._wizardRecommended = recommended.value;
+      sel.value = recommended.value;
+      sel.dispatchEvent(new Event('change'));
+      const planoRec = offsetRecommendPlano(recommended.value, sz.w, sz.h);
+      const mesinRec = offsetRecommendMesinForSize(sz.w, sz.h);
+      if(planoRec){
+        const planoSel = kertasRow.querySelector('.ofckr-plano');
+        planoSel.value = String(planoRec.idx);
+        planoSel.dispatchEvent(new Event('change'));
+      }
+      if(mesinRec){
+        const mesinSel = node.querySelector('.ofc-mesin');
+        mesinSel.value = mesinRec.nama;
+        mesinSel.dispatchEvent(new Event('change'));
+      }
+    }
+    const qtyInp = kertasRow.querySelector('.ofckr-qty');
+    if(qtyInp){ qtyInp.value = qtyOrder; qtyInp.dispatchEvent(new Event('input')); }
+    return node;
+  }
+
+  if(v.tipe==='lipat'){
+    // Lipat 2/Lipat 3: 1 komponen saja, tanpa Finishing Gabungan (jilid)
+    buatKomponen('Body', [...OFFSET_CP.materialCover, ...OFFSET_CP.materialIsi]);
+  } else {
+    buatKomponen('Cover', OFFSET_CP.materialCover);
+    buatKomponen('Isi', OFFSET_CP.materialIsi);
+    if(v.finishing){
+      gabunganAddFinishing($('#offset-finishings'), state.offset.finishings, ()=>({qty: qtyOrder}));
+      const row = $('#offset-finishings').querySelector('.fin-row:last-child');
+      if(row){
+        const selFin = row.querySelector('.offin-name');
+        const opt = Array.from(selFin.options).find(o=>o.value===v.finishing);
+        if(opt){ selFin.value = v.finishing; selFin.dispatchEvent(new Event('change')); }
+      }
+    }
+    if(varianKey==='hardcover_full' || varianKey==='hardcover_spiral'){
+      ['Board (Chipboard) — manual', 'Endpaper — manual'].forEach(label=>{
+        gabunganAddFinishing($('#offset-finishings'), state.offset.finishings, ()=>({qty: qtyOrder}));
+        const row = $('#offset-finishings').querySelector('.fin-row:last-child');
+        if(row){
+          const selFin = row.querySelector('.offin-name');
+          const opt = Array.from(selFin.options).find(o=>o.value==='Lainnya');
+          if(opt){
+            selFin.value = 'Lainnya'; selFin.dispatchEvent(new Event('change'));
+            const customInp = row.querySelector('.offin-customname');
+            if(customInp){ customInp.value = label; customInp.dispatchEvent(new Event('input')); }
+          }
+        }
+      });
+    }
+  }
+  calc();
+}
+
+function offsetApplyBukuVarian(varianKey, sizeObj){
+  const v = OFFSET_BUKU.variasiProduksi[varianKey];
+  if(!v) return;
+  const qtyOrder = state.offset.qtyOrder||1;
+
+  $('#offset-components').innerHTML = '';
+  state.offset.components.clear();
+  $('#offset-finishings').innerHTML = '';
+  state.offset.finishings.clear();
+
+  // Ukuran: dari pilihan admin (dropdown Ukuran / custom Lebar-Tinggi)
+  const sz = sizeObj || OFFSET_UKURAN_CM['A4'];
+
+  function buatKomponen(label, materialList){
+    const node = offsetAddComponent();
+    node.querySelector('.ofc-label') && (node.querySelector('.ofc-label').value = label);
+    const compState = state.offset.components.get(node.dataset.id);
+    compState.pw = sz.w; compState.ph = sz.h;
+    node.querySelector('.ofc-pw').value = sz.w;
+    node.querySelector('.ofc-ph').value = sz.h;
+    const kertasRow = node.querySelector('.ofc-kertas-rows .kertas-row');
+    const namaList = materialList.map(m=>m.nama);
+    compState._wizardMaterialList = namaList;
+    const sel = kertasRow.querySelector('.ofckr-kertas');
+    Array.from(sel.options).forEach(opt=>{
+      if(opt.value && opt.value!=='__custom__' && !namaList.includes(opt.value)) opt.remove();
+    });
+    const recommended = Array.from(sel.options).find(o=>o.value && o.value!=='__custom__');
+    if(recommended){
+      compState._wizardRecommended = recommended.value;
+      sel.value = recommended.value;
+      sel.dispatchEvent(new Event('change'));
+
+      // Rekomendasi Plano paling efisien (berdasar bahan) + Mesin paling pas (berdasar Ukuran Jadi)
+      const planoRec = offsetRecommendPlano(recommended.value, compState.pw, compState.ph);
+      const mesinRec = offsetRecommendMesinForSize(compState.pw, compState.ph);
+      if(planoRec){
+        const planoSel = kertasRow.querySelector('.ofckr-plano');
+        planoSel.value = String(planoRec.idx);
+        planoSel.dispatchEvent(new Event('change'));
+      }
+      if(mesinRec){
+        const mesinSel = node.querySelector('.ofc-mesin');
+        mesinSel.value = mesinRec.nama;
+        mesinSel.dispatchEvent(new Event('change'));
+      }
+      if(planoRec || mesinRec){
+        const noteEl2 = node.querySelector('.ofc-plano-info');
+        if(noteEl2) noteEl2.insertAdjacentHTML('beforebegin',
+          `<div class="tierinfo">${planoRec?`Rekomendasi Plano: <b>${planoRec.ukuran}</b> (muat ${planoRec.up} pcs/lembar, paling efisien dari opsi bahan ini). `:''}${mesinRec?`Rekomendasi Mesin: <b>${mesinRec.nama}</b> (muat ${mesinRec.up} pcs/lembar cetak, paling efisien utk ukuran ini).`:''} Tetap bisa diganti manual.</div>`);
+      }
+    }
+    const qtyInp = kertasRow.querySelector('.ofckr-qty');
+    if(qtyInp){ qtyInp.value = qtyOrder; qtyInp.dispatchEvent(new Event('input')); }
+    return node;
+  }
+
+  buatKomponen('Cover', OFFSET_BUKU.materialCover);
+  buatKomponen('Isi', OFFSET_BUKU.materialIsi);
+
+  // Finishing Gabungan (Binding) sesuai Variasi Produksi
+  const BUKU_FIN_MAP = {
+    softcover_lem: 'Lem Panas Buku (Softcover) (Otomatis)',
+    softcover_steples: 'Steples',
+    softcover_spiral: 'Spiral (Otomatis)',
+    softcover_jahitbenang: 'Jahit Buku (Otomatis)',
+    hardcover_full: 'Hardcover',
+    hardcover_spiral: 'Spiral (Otomatis)'
+  };
+  const finTarget = BUKU_FIN_MAP[varianKey];
+  if(finTarget){
+    gabunganAddFinishing($('#offset-finishings'), state.offset.finishings, ()=>({qty: qtyOrder}));
+    const row = $('#offset-finishings').querySelector('.fin-row:last-child');
+    if(row){
+      const selFin = row.querySelector('.offin-name');
+      const opt = Array.from(selFin.options).find(o=>o.value===finTarget);
+      if(opt){ selFin.value = finTarget; selFin.dispatchEvent(new Event('change')); }
+    }
+  }
+  // Board + Endpaper (manual) khusus Hardcover
+  if(OFFSET_BUKU.variasiHardcover.includes(varianKey)){
+    ['Board (Chipboard) — manual', 'Endpaper — manual'].forEach(label=>{
+      gabunganAddFinishing($('#offset-finishings'), state.offset.finishings, ()=>({qty: qtyOrder}));
+      const row = $('#offset-finishings').querySelector('.fin-row:last-child');
+      if(row){
+        const selFin = row.querySelector('.offin-name');
+        const opt = Array.from(selFin.options).find(o=>o.value==='Lainnya');
+        if(opt){
+          selFin.value = 'Lainnya'; selFin.dispatchEvent(new Event('change'));
+          const customInp = row.querySelector('.offin-customname');
+          if(customInp){ customInp.value = label; customInp.dispatchEvent(new Event('input')); }
+        }
+      }
+    });
+  }
+  calc();
+}
+
 $('#offset-varian').addEventListener('change', e=>{
   const jenisKey = $('#offset-jenisorder').value;
   const def = OFFSET_JENIS_ORDER[jenisKey];
   if(!def || !e.target.value) return;
+
+  if(def.isBukuDetailed || def.isCPDetailed){
+    const ukWrap = $('#offset-ukuran-wrap');
+    const ukSel = $('#offset-ukuran');
+    const ukuranList = def.isCPDetailed ? OFFSET_CP.ukuran : OFFSET_BUKU.ukuran;
+    ukWrap.style.display = '';
+    ukSel.innerHTML = `<option value="">— Pilih Ukuran —</option>` +
+      ukuranList.map(u=>`<option value="${u.key}">${u.label}</option>`).join('');
+    $('#offset-ukuran-custom-wrap').style.display = 'none';
+    return;
+  }
 
   // mulai fresh: bikin 1 Komponen Cetak baru utk Varian ini
   $('#offset-components').innerHTML = '';
@@ -6199,6 +6735,35 @@ $('#offset-varian').addEventListener('change', e=>{
 });
 
 $('#offset-qty-order-unit').addEventListener('change', e=>{ state.offset.qtyOrderUnit=e.target.value; calc(); });
+
+$('#offset-ukuran').addEventListener('change', e=>{
+  const ukKey = e.target.value;
+  const custWrap = $('#offset-ukuran-custom-wrap');
+  custWrap.style.display = ukKey==='custom' ? '' : 'none';
+  if(!ukKey) return;
+  const varianKey = $('#offset-varian').value;
+  const jenisKey = $('#offset-jenisorder').value;
+  const def = OFFSET_JENIS_ORDER[jenisKey];
+  if(!varianKey || !def) return;
+  if(ukKey==='custom') return; // tunggu admin isi Lebar/Tinggi custom dulu
+  const ukuranList = def.isCPDetailed ? OFFSET_CP.ukuran : OFFSET_BUKU.ukuran;
+  const u = ukuranList.find(x=>x.key===ukKey);
+  if(def.isCPDetailed) offsetApplyCPVarian(varianKey, u);
+  else offsetApplyBukuVarian(varianKey, u);
+});
+$('#offset-ukuran-lebar').addEventListener('input', offsetBukuCustomSizeHandler);
+$('#offset-ukuran-tinggi').addEventListener('input', offsetBukuCustomSizeHandler);
+function offsetBukuCustomSizeHandler(){
+  const w = +$('#offset-ukuran-lebar').value||0;
+  const h = +$('#offset-ukuran-tinggi').value||0;
+  const varianKey = $('#offset-varian').value;
+  const jenisKey = $('#offset-jenisorder').value;
+  const def = OFFSET_JENIS_ORDER[jenisKey];
+  if(!varianKey || w<=0 || h<=0 || !def) return;
+  if(def.isCPDetailed) offsetApplyCPVarian(varianKey, {key:'custom', w, h});
+  else offsetApplyBukuVarian(varianKey, {key:'custom', w, h});
+}
+
 $('#offset-add-comp').addEventListener('click', ()=>{ offsetAddComponent(); calc(); });
 $('#cp-nama').addEventListener('input', e=>{ state.cp.nama=e.target.value; });
 $('#cp-qty-order').addEventListener('input', e=>{ state.cp.qtyOrder=Math.max(1,+e.target.value||1); calc(); });
@@ -6619,9 +7184,24 @@ function a3RenderJenisOrderPreview(){
     a3WireSizeJadi(box, 'jok1', node, compState, ()=>null);
   } else {
     const komponenAwal = def.autoComponents && def.autoComponents.length ? def.autoComponents : ['Komponen 1','Komponen 2'];
+    const isCompanyProfile = key==='company_profile';
+    const CP_VARIAN = ['Lipat 2','Lipat 3','Booklet','Softcover Jilid Lem','Softcover Spiral','Hardcover Full','Hardcover Spiral'];
+    const CP_VARIAN_FINGAB = {'Booklet':'Steples','Softcover Jilid Lem':'Lem Panas','Softcover Spiral':'Spiral','Hardcover Full':'Hardcover','Hardcover Spiral':'Hardcover'};
+    const CP_VARIAN_SATUKOMPONEN = new Set(['Lipat 2','Lipat 3']);
+
+    const varianHtml = isCompanyProfile ? `<div class="comp-sub comp-sub-utama">
+        <label class="comp-section-lbl">Varian</label>
+        <select class="jok2-cpvarian">
+          <option value="">— Pilih Varian —</option>
+          ${CP_VARIAN.map(v=>`<option value="${v}">${v}</option>`).join('')}
+        </select>
+        <div class="tierinfo jok2-cpvarian-note" style="margin-top:6px">Jenis Finishing Gabungan otomatis mengikuti Varian yang dipilih di atas.</div>
+      </div>` : '';
+
     box.innerHTML = `<div class="comp-sub comp-sub-utama"><label class="comp-section-lbl">Spesifikasi: ${def.label}</label>
       <div class="note" style="margin:0 0 10px">Sisi Cetak & Finishing Komponen lengkapi langsung di Komponen Cetak di bawah. Komponen bisa dihapus/ditambah.</div></div>
-      <div class="comp-sub comp-sub-finishing">
+      ${varianHtml}
+      <div class="comp-sub comp-sub-finishing jok2-fingab-wrap" style="${isCompanyProfile ? 'display:none' : ''}">
         <label class="comp-section-lbl">Jenis Finishing Gabungan</label>
         <div class="note" style="margin:0 0 10px">Pilih dulu — jadi acuan Size Cetak semua komponen di bawah.</div>
         <select class="jok2-fingab">
@@ -6633,7 +7213,15 @@ function a3RenderJenisOrderPreview(){
 
     const listEl = box.querySelector('.jok2-komponen-list');
     const fingabSel = box.querySelector('.jok2-fingab');
+    const fingabWrap = box.querySelector('.jok2-fingab-wrap');
     let finishingGabungan = FINISHING_GABUNGAN_GENERIK[0];
+
+    function applyFinishingGabungan(value){
+      finishingGabungan = value;
+      fingabSel.value = value;
+      a3JoLinks.k2.forEach(x=>x.refreshFn());
+      a3SyncFinishingGabungan(finishingGabungan);
+    }
 
     function addKomponenBlock(nama){
       const id = 'jok2c'+(++a3JoK2Seq);
@@ -6664,6 +7252,23 @@ function a3RenderJenisOrderPreview(){
     }
 
     komponenAwal.forEach(nm=>addKomponenBlock(nm));
+
+    if(isCompanyProfile){
+      const cpVarianSel = box.querySelector('.jok2-cpvarian');
+      cpVarianSel.addEventListener('change', e=>{
+        const varian = e.target.value;
+        if(!varian) return;
+        if(CP_VARIAN_SATUKOMPONEN.has(varian)){
+          // Lipat 2/Lipat 3: cukup 1 komponen (tanpa Cover+Isi terpisah), tanpa Finishing Gabungan (jilid)
+          const rows = Array.from(listEl.children);
+          rows.slice(1).forEach(r=>r.querySelector('.jok2-remove').click());
+          a3SyncFinishingGabungan('Tanpa');
+        } else {
+          const preset = CP_VARIAN_FINGAB[varian];
+          if(preset) applyFinishingGabungan(preset);
+        }
+      });
+    }
 
     box.querySelector('#jok2-add-komponen').addEventListener('click', ()=>{
       const nama = prompt('Nama komponen baru (mis. Amplop, Insert, Kartu Ucapan):', 'Komponen Tambahan');
