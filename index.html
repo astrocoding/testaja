@@ -4041,16 +4041,15 @@ function offsetLembarCetak(qtyPesanan, up){
   return Math.ceil(qtyPesanan/up) + 150; // 150 lembar insheet/waste
 }
 
-// Hitung Jumlah Klik mesin dari Lembar Cetak, jumlah plat, dan mode bolak-balik
-function offsetJumlahKlik(lembarCetak, jumlahPlat, bolakBalik){
-  return lembarCetak * jumlahPlat * (bolakBalik ? 2 : 1);
+// Hitung Jumlah Klik PER PLAT (lembar cetak, dikali 2 kalau bolak-balik 1 set plat 2 muka)
+function offsetKlikPerPlat(lembarCetak, bolakBalik){
+  return lembarCetak * (bolakBalik ? 2 : 1);
 }
 
-// Hitung Ongkos Cetak total (utk SEMUA jumlah klik, sudah termasuk semua plat)
-// rate = ongkos per klik, minim = ongkos minimum (utk klik pertama sejumlah qtyMinimKlik), qtyMinimKlik = ambang (1000/2500)
-function offsetOngkosCetak(jumlahKlik, rate, minim, qtyMinimKlik){
-  if(jumlahKlik<=qtyMinimKlik) return minim;
-  return minim + (jumlahKlik-qtyMinimKlik)*rate;
+// Ongkos Cetak PER PLAT = max(klik × rate, minimum rupiah). Lalu di pemanggil dikali jumlah plat.
+// (minimum Rp berlaku PER PLAT -- full color 4 plat berarti 4× minimum)
+function offsetOngkosCetakPerPlat(klikPerPlat, rate, minimRupiah){
+  return Math.max(klikPerPlat*rate, minimRupiah);
 }
 
 // ================= OFFSET: komponen =================
@@ -4767,7 +4766,7 @@ function offsetAddComponent(){
     if(m){
       const ac = offsetParseSize(m.area_cetak);
       const ak = offsetParseSize(m.area_kertas);
-      node.querySelector('.ofc-mesin-info').innerHTML = `Area Kertas: <b>${ak.w}×${ak.h}cm</b> · Area Cetak: <b>${ac.w}×${ac.h}cm</b> · Plat: ${rp(m.ongkos_plat_per_warna)}/warna · Cetak: ${rp(m.ongkos_per_klik)}/klik (min ${rp(m.ongkos_klik_minim)} / ${m.qty_minim_klik} klik)`;
+      node.querySelector('.ofc-mesin-info').innerHTML = `Area Kertas: <b>${ak.w}×${ak.h}cm</b> · Area Cetak: <b>${ac.w}×${ac.h}cm</b> · Plat: ${rp(m.ongkos_plat_per_warna)}/warna · Cetak: ${rp(m.ongkos_per_klik)}/klik (min ${rp(m.ongkos_klik_minim)}/plat)`;
     } else {
       node.querySelector('.ofc-mesin-info').innerHTML = '';
     }
@@ -5212,8 +5211,10 @@ function offsetComponentPrice(comp){
   if(totalQty<=0) return {total:0, label:'(Qty belum diisi di baris kertas manapun)', lines:[], up:L1.total};
   const lembarCetak = offsetLembarCetak(totalQty, L1.total);
   const platInfo = offsetPlatInfo(comp);
-  const jumlahKlik = offsetJumlahKlik(lembarCetak, platInfo.jumlahPlatSet, platInfo.bolakBalik);
-  const ongkosCetak = offsetOngkosCetak(jumlahKlik, m.ongkos_per_klik, m.ongkos_klik_minim, m.qty_minim_klik);
+  const klikPerPlat = offsetKlikPerPlat(lembarCetak, platInfo.bolakBalik);
+  const ongkosCetakPerPlat = offsetOngkosCetakPerPlat(klikPerPlat, m.ongkos_per_klik, m.ongkos_klik_minim);
+  const ongkosCetak = ongkosCetakPerPlat * platInfo.jumlahPlatSet;
+  const jumlahKlik = klikPerPlat * platInfo.jumlahPlatSet; // total klik (utk info saja)
   const ongkosPlat = platInfo.jumlahPlatSet * m.ongkos_plat_per_warna;
 
   // Ukuran Kertas Cetak: blok hasil Up (+bleed) + tarikan mesin (1cm keliling)
@@ -5263,9 +5264,12 @@ function offsetComponentPrice(comp){
     sub: `${platInfo.jumlahPlatSet} plat × ${rp(m.ongkos_plat_per_warna)}`,
     val: ongkosPlat
   });
+  const perPlatTxt = klikPerPlat*m.ongkos_per_klik < m.ongkos_klik_minim
+    ? `${klikPerPlat} klik/plat × ${rp(m.ongkos_per_klik)} = ${rp(klikPerPlat*m.ongkos_per_klik)} → min ${rp(m.ongkos_klik_minim)}/plat`
+    : `${klikPerPlat} klik/plat × ${rp(m.ongkos_per_klik)} = ${rp(ongkosCetakPerPlat)}/plat`;
   lines.push({
     label: `Ongkos Cetak`,
-    sub: `${comp.up}up${splitTxt}, ${lembarCetak} lbr cetak (total qty ${totalQty} pcs dari ${kertasRows.length} baris kertas)${bbTxt} → ${jumlahKlik} klik (min ${m.qty_minim_klik}) × ${rp(m.ongkos_per_klik)}`,
+    sub: `${comp.up}up${splitTxt}, ${lembarCetak} lbr cetak (total qty ${totalQty} pcs dari ${kertasRows.length} baris kertas)${bbTxt} · ${perPlatTxt} × ${platInfo.jumlahPlatSet} plat`,
     val: ongkosCetak
   });
   if(ukc.w>0){
