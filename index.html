@@ -278,8 +278,8 @@
 
   @media (max-width:560px){
     .app{grid-template-columns:1fr; position:relative;}
-    #materialModal, #orderFormModal, #editPricingModal{align-items:flex-end !important; padding:0 !important;}
-    #materialModal > div, #orderFormModal > div, #editPricingModal > div{max-width:100% !important; width:100% !important; border-radius:16px 16px 0 0 !important; max-height:94vh !important;}
+    #materialModal, #orderFormModal, #editPricingModal, #stockwidthModal, #installModal{align-items:flex-end !important; padding:0 !important;}
+    #materialModal > div, #orderFormModal > div, #editPricingModal > div, #stockwidthModal > div, #installModal > div{max-width:100% !important; width:100% !important; border-radius:16px 16px 0 0 !important; max-height:94vh !important;}
     .sidebar{
       position:fixed; left:0; top:0; width:250px; max-width:82vw; height:100vh; z-index:60;
       transform:translateX(-104%); transition:transform .22s ease; box-shadow:0 0 0 100vmax rgba(6,14,28,0);
@@ -918,16 +918,22 @@
           <h3>Daftar Lebar Bahan</h3>
           <div style="display:flex; gap:8px; align-items:center;">
             <span class="cnt" id="stockwidthCount">0 items</span>
-            <button class="btn sm ghost manage-only" onclick="toggleForm('stockwidthForm')">+ Tambah Manual</button>
+            <button class="btn sm ghost manage-only" onclick="openStockWidthModal()">+ Tambah Manual</button>
           </div>
         </div>
         <div class="table-scroll"><table>
-          <thead><tr><th>Material</th><th>Lokasi</th><th>Lebar (cm)</th><th>Status</th><th>Default</th></tr></thead>
+          <thead><tr><th>Material</th><th>Lokasi</th><th>Lebar (cm)</th><th>Status</th><th>Default</th><th>Aksi</th></tr></thead>
           <tbody id="stockwidthTableBody"></tbody>
         </table></div>
         <div id="stockwidthEmpty"></div>
 
-        <div class="add-form" id="stockwidthForm">
+        <div id="stockwidthModal" style="display:none; position:fixed; inset:0; background:rgba(6,14,28,0.72); z-index:230; align-items:center; justify-content:center; padding:12px;">
+          <div style="background:#fff; border-radius:14px; max-width:480px; width:100%; max-height:92vh; display:flex; flex-direction:column; overflow:hidden;">
+            <div style="display:flex; align-items:center; justify-content:space-between; padding:16px 20px; border-bottom:1px solid #eef1f5; flex-shrink:0;">
+              <b id="stockwidthModalTitle" style="font-size:14.5px; color:#101828;">Tambah Lebar Bahan</b>
+              <button onclick="closeStockWidthModal()" style="border:none; background:#f2f4f7; width:26px; height:26px; border-radius:7px; font-size:13px; cursor:pointer;">✕</button>
+            </div>
+            <div class="add-form open" id="stockwidthForm" style="flex:1; overflow-y:auto; padding:16px 20px; margin:0; border:none; border-radius:0;">
           <div class="form-grid">
             <div><label>Material (LF)</label><select id="sf_material"></select></div>
             <div><label>Lokasi</label><select id="sf_location"><option value="purwakarta">Purwakarta</option><option value="graha">Graha</option><option value="outsourcing">Outsourcing</option></select></div>
@@ -935,8 +941,12 @@
             <div><label>Status</label><select id="sf_status"><option value="active">Aktif</option><option value="inactive">Nonaktif</option></select></div>
           </div>
           <div class="checks"><label><input type="checkbox" id="sf_default"> Jadikan default untuk kombinasi ini</label></div>
-          <button class="btn sm" onclick="submitStockWidthForm()">Simpan Lebar Bahan</button>
-          <button class="btn sm ghost" onclick="toggleForm('stockwidthForm')">Batal</button>
+            </div>
+            <div style="display:flex; gap:8px; padding:14px 20px; border-top:1px solid #eef1f5; flex-shrink:0;">
+              <button class="btn sm ghost" style="flex:1; justify-content:center;" onclick="closeStockWidthModal()">Batal</button>
+              <button class="btn sm" style="flex:1; justify-content:center;" onclick="submitStockWidthForm()">Simpan Lebar Bahan</button>
+            </div>
+          </div>
         </div>
       </div>
     </section>
@@ -955,24 +965,34 @@
           <h3>Daftar Jasa Pemasangan</h3>
           <div style="display:flex; gap:8px; align-items:center;">
             <span class="cnt" id="installCount">0 items</span>
-            <button class="btn sm ghost manage-only" onclick="toggleForm('installForm')">+ Tambah Manual</button>
+            <button class="btn sm ghost manage-only" onclick="openInstallModal()">+ Tambah Manual</button>
           </div>
         </div>
         <div class="table-scroll"><table>
-          <thead><tr><th>Nama Layanan</th><th>Harga Default</th><th>Satuan</th><th>Dapat Diedit</th></tr></thead>
+          <thead><tr><th>Nama Layanan</th><th>Harga Default</th><th>Satuan</th><th>Dapat Diedit</th><th>Aksi</th></tr></thead>
           <tbody id="installTableBody"></tbody>
         </table></div>
         <div id="installEmpty"></div>
 
-        <div class="add-form" id="installForm">
+        <div id="installModal" style="display:none; position:fixed; inset:0; background:rgba(6,14,28,0.72); z-index:230; align-items:center; justify-content:center; padding:12px;">
+          <div style="background:#fff; border-radius:14px; max-width:460px; width:100%; max-height:92vh; display:flex; flex-direction:column; overflow:hidden;">
+            <div style="display:flex; align-items:center; justify-content:space-between; padding:16px 20px; border-bottom:1px solid #eef1f5; flex-shrink:0;">
+              <b id="installModalTitle" style="font-size:14.5px; color:#101828;">Tambah Jasa Pemasangan</b>
+              <button onclick="closeInstallModal()" style="border:none; background:#f2f4f7; width:26px; height:26px; border-radius:7px; font-size:13px; cursor:pointer;">✕</button>
+            </div>
+            <div class="add-form open" id="installForm" style="flex:1; overflow-y:auto; padding:16px 20px; margin:0; border:none; border-radius:0;">
           <div class="form-grid">
             <div><label>Nama Layanan</label><input id="if_name" placeholder="e.g. Pasang Banner Outdoor"></div>
             <div><label>Harga Default (Rp)</label><input id="if_price" type="number" placeholder="40000"></div>
             <div><label>Satuan</label><select id="if_unit"><option value="m2">Per m²</option><option value="flat">Flat</option></select></div>
           </div>
           <div class="checks"><label><input type="checkbox" id="if_editable" checked> Dapat diedit saat estimasi</label></div>
-          <button class="btn sm" onclick="submitInstallForm()">Simpan Layanan</button>
-          <button class="btn sm ghost" onclick="toggleForm('installForm')">Batal</button>
+            </div>
+            <div style="display:flex; gap:8px; padding:14px 20px; border-top:1px solid #eef1f5; flex-shrink:0;">
+              <button class="btn sm ghost" style="flex:1; justify-content:center;" onclick="closeInstallModal()">Batal</button>
+              <button class="btn sm" style="flex:1; justify-content:center;" onclick="submitInstallForm()">Simpan Layanan</button>
+            </div>
+          </div>
         </div>
       </div>
     </section>
@@ -2786,30 +2806,82 @@ function renderStockWidthMaterialSelect(){
   const items = MATERIALS.filter(m => m.engine === 'lf');
   sel.innerHTML = items.length ? items.map(m => `<option value="${m.id}">${m.name} (${m.code})</option>`).join('') : `<option value="">— Tambahkan Material LF dulu —</option>`;
 }
+let EDIT_STOCKWIDTH_ID = null;
+function openStockWidthModal(id){
+  EDIT_STOCKWIDTH_ID = id || null;
+  const w = id ? STOCK_WIDTHS.find(x => x.id === id) : null;
+  document.getElementById('stockwidthModalTitle').textContent = w ? 'Edit Lebar Bahan' : 'Tambah Lebar Bahan';
+  renderStockWidthMaterialSelect();
+  document.getElementById('sf_material').value = w ? w.materialId : '';
+  document.getElementById('sf_location').value = w ? w.location : 'purwakarta';
+  document.getElementById('sf_width').value = w ? w.widthCm : '';
+  document.getElementById('sf_status').value = w ? w.status : 'active';
+  document.getElementById('sf_default').checked = w ? !!w.isDefault : false;
+  document.getElementById('stockwidthModal').style.display = 'flex';
+}
+function closeStockWidthModal(){
+  document.getElementById('stockwidthModal').style.display = 'none';
+  EDIT_STOCKWIDTH_ID = null;
+}
 function submitStockWidthForm(){
   if(!requireManagePermission()) return;
   const materialId = document.getElementById('sf_material').value;
   const width = parseFloat(document.getElementById('sf_width').value);
   if(!materialId || !width){ alert('Pilih Material dan isi Lebar.'); return; }
-  STOCK_WIDTHS.push({
-    id: nextId('sw'), materialId, location: document.getElementById('sf_location').value, widthCm: width,
-    status: document.getElementById('sf_status').value, isDefault: document.getElementById('sf_default').checked, source: 'manual',
-  });
-  document.getElementById('sf_width').value = '';
-  toggleForm('stockwidthForm');
+  const fields = {
+    materialId, location: document.getElementById('sf_location').value, widthCm: width,
+    status: document.getElementById('sf_status').value, isDefault: document.getElementById('sf_default').checked,
+  };
+  if(EDIT_STOCKWIDTH_ID){
+    const existing = STOCK_WIDTHS.find(x => x.id === EDIT_STOCKWIDTH_ID);
+    if(existing){ Object.assign(existing, fields); existing.source = 'manual'; }
+  } else {
+    STOCK_WIDTHS.push({ id: nextId('sw'), ...fields, source: 'manual' });
+  }
+  closeStockWidthModal();
+  saveState();
   renderAll();
+  showToast('Lebar Bahan berhasil disimpan.');
 }
 
 /* ---- INSTALLATION SERVICE ---- */
+let EDIT_INSTALL_ID = null;
+function openInstallModal(id){
+  EDIT_INSTALL_ID = id || null;
+  const s = id ? INSTALL_SERVICES.find(x => x.id === id) : null;
+  document.getElementById('installModalTitle').textContent = s ? 'Edit Jasa Pemasangan' : 'Tambah Jasa Pemasangan';
+  document.getElementById('if_name').value = s ? s.name : '';
+  document.getElementById('if_price').value = s ? s.defaultPrice : '';
+  document.getElementById('if_unit').value = s ? s.unit : 'm2';
+  document.getElementById('if_editable').checked = s ? !!s.editable : true;
+  document.getElementById('installModal').style.display = 'flex';
+}
+function closeInstallModal(){
+  document.getElementById('installModal').style.display = 'none';
+  EDIT_INSTALL_ID = null;
+}
+function deleteInstallService(id){
+  if(!requireManagePermission()) return;
+  if(!confirm('Hapus Jasa Pemasangan ini?')) return;
+  INSTALL_SERVICES = INSTALL_SERVICES.filter(x => x.id !== id);
+  saveState(); renderAll();
+}
 function submitInstallForm(){
   if(!requireManagePermission()) return;
   const name = document.getElementById('if_name').value.trim();
   const price = parseFloat(document.getElementById('if_price').value);
   if(!name || !price){ alert('Isi Nama dan Harga.'); return; }
-  INSTALL_SERVICES.push({ id: nextId('is'), name, defaultPrice: price, unit: document.getElementById('if_unit').value, editable: document.getElementById('if_editable').checked, source: 'manual' });
-  ['if_name','if_price'].forEach(id => document.getElementById(id).value = '');
-  toggleForm('installForm');
+  const fields = { name, defaultPrice: price, unit: document.getElementById('if_unit').value, editable: document.getElementById('if_editable').checked };
+  if(EDIT_INSTALL_ID){
+    const existing = INSTALL_SERVICES.find(x => x.id === EDIT_INSTALL_ID);
+    if(existing){ Object.assign(existing, fields); existing.source = 'manual'; }
+  } else {
+    INSTALL_SERVICES.push({ id: nextId('is'), ...fields, source: 'manual' });
+  }
+  closeInstallModal();
+  saveState();
   renderAll();
+  showToast('Jasa Pemasangan berhasil disimpan.');
 }
 
 /* =====================================================================
@@ -4146,15 +4218,37 @@ function renderStockWidthTable(){
   document.getElementById('stockwidthTableBody').innerHTML = STOCK_WIDTHS.map(w => {
     const mat = MATERIALS.find(m => m.id === w.materialId);
     return `<tr><td>${mat ? mat.name : '—'}</td><td>${locLabel(w.location)}</td><td>${w.widthCm} cm</td>
-    <td><span class="cat-pill ${w.status==='active'?'ok':'bad'}">${w.status}</span></td><td>${w.isDefault ? '✓' : '—'}</td></tr>`;
+    <td><span class="cat-pill ${w.status==='active'?'ok':'bad'}">${w.status}</span></td><td>${w.isDefault ? '✓' : '—'}</td>
+    <td style="white-space:nowrap;">
+      <a href="#" onclick="openStockWidthModal('${w.id}');return false;" class="manage-only">Edit</a>
+      <a href="#" onclick="toggleStockWidthStatus('${w.id}');return false;" class="manage-only" style="margin-left:8px;">${w.status==='active'?'Nonaktifkan':'Aktifkan'}</a>
+      <a href="#" onclick="deleteStockWidth('${w.id}');return false;" class="manage-only" style="margin-left:8px; color:var(--danger);">Hapus</a>
+    </td></tr>`;
   }).join('');
   document.getElementById('stockwidthEmpty').innerHTML = STOCK_WIDTHS.length ? '' : `<div class="empty-state"><div class="ic">📏</div><h3>Belum ada lebar stok</h3><p>Large Format tidak dapat menghitung tanpa data ini.</p></div>`;
+}
+function toggleStockWidthStatus(id){
+  if(!requireManagePermission()) return;
+  const w = STOCK_WIDTHS.find(x => x.id === id);
+  if(!w) return;
+  w.status = w.status === 'active' ? 'inactive' : 'active';
+  saveState(); renderAll();
+}
+function deleteStockWidth(id){
+  if(!requireManagePermission()) return;
+  if(!confirm('Hapus Lebar Bahan ini?')) return;
+  STOCK_WIDTHS = STOCK_WIDTHS.filter(x => x.id !== id);
+  saveState(); renderAll();
 }
 function renderInstallTable(){
   document.getElementById('installCount').textContent = INSTALL_SERVICES.length + ' items';
   document.getElementById('installTableBody').innerHTML = INSTALL_SERVICES.map(s => `
     <tr><td>${s.name}</td><td>${rupiah(s.defaultPrice)}</td><td>${s.unit === 'm2' ? 'Per m²' : 'Flat'}</td>
-    <td>${s.editable ? 'Ya' : 'Tidak'}</td></tr>
+    <td>${s.editable ? 'Ya' : 'Tidak'}</td>
+    <td style="white-space:nowrap;">
+      <a href="#" onclick="openInstallModal('${s.id}');return false;" class="manage-only">Edit</a>
+      <a href="#" onclick="deleteInstallService('${s.id}');return false;" class="manage-only" style="margin-left:8px; color:var(--danger);">Hapus</a>
+    </td></tr>
   `).join('');
   document.getElementById('installEmpty').innerHTML = INSTALL_SERVICES.length ? '' : `<div class="empty-state"><div class="ic">🧰</div><h3>Belum ada layanan pemasangan</h3><p>Tambahkan manual atau import.</p></div>`;
 }
